@@ -16,6 +16,7 @@ services:
       - 9300:9300
     networks:
       - compose-services_devnet
+
   kibana-service:
     image: docker.elastic.co/kibana/kibana-oss:6.5.4
     container_name: kibana-service
@@ -47,6 +48,7 @@ services:
       - ./Secrets/etlMapping.yaml:/usr/share/gen3/tube/etlMapping.yaml
     depends_on:
       - spark-service
+
   spark-service:
     image: "quay.io/cdis/gen3-spark:master"
     container_name: spark-service
@@ -66,19 +68,19 @@ services:
       - esproxy-service
 
 
-  etl-service:
-    image: "gen3-etl-lite:latest"
-    container_name: etl-service
-    networks:
-      - devnet
-    volumes:
-      - ./apis_configs/sheepdog_creds.json:/gen3_replicator/creds.json
-      - ./example-schemas:/schemas_dir
-    environment:
-      DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-    depends_on:
-      - postgres
-      - esproxy-service
+  # etl-service:
+  #   image: "gen3-etl-lite:latest"
+  #   container_name: etl-service
+  #   networks:
+  #     - compose-services_devnet
+  #   volumes:
+  #     - ./apis_configs/sheepdog_creds.json:/gen3_replicator/creds.json
+  #     - ./example-schemas:/schemas_dir
+  #   environment:
+  #     DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+  #   depends_on:
+  #     - postgres
+  #     - esproxy-service
 
 networks:
   compose-services_devnet:
