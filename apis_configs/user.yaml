@@ -5,7 +5,14 @@ groups: {}
 users:
   cdis:
     admin: True
-  thanhnd@uchicago.edu:
+  test:
+    admin: True
+    projects:
+    - auth_id: atac
+      privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+
+
+  brian@bwalsh.com:
     admin: True
     projects:
     - auth_id: jnkns

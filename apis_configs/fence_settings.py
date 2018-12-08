@@ -5,7 +5,7 @@ APP_NAME = 'fence'
 
 DB = 'postgresql://{{db_username}}:{{db_password}}@{{db_host}}:5432/{{db_database}}'
 
-MOCK_AUTH = False
+MOCK_AUTH = True
 MOCK_STORAGE = True
 
 EMAIL_SERVER = 'localhost'

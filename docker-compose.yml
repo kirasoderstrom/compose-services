@@ -1,15 +1,19 @@
 version: '3'
 services:
   postgres:
-    image: postgres:9.5
+    #image: postgres:9.5
+    build: postgres
     networks:
       - devnet
     volumes:
       - "psqldata:/var/lib/postgresql/data"
       - "./scripts/postgres_init.sql:/docker-entrypoint-initdb.d/postgres_init.sql"
+      - ./postgres/postgres.conf:/etc/postgresql.conf
+      - ./postgres/pg_hba.conf:/etc/pg_hba.conf
     restart: unless-stopped
     ports:
       - 5432:5432
+    command: postgres -c config_file=/etc/postgresql.conf -c hba_file=/etc/pg_hba.conf
   indexd-service:
     image: "quay.io/cdis/indexd:master"
     command: bash indexd_setup.sh
@@ -76,23 +80,23 @@ services:
     environment: *env
     depends_on:
       - postgres
-  portal-service:
-    image: "quay.io/cdis/data-portal:master"
-    container_name: portal-service
-    command: ["bash", "/var/www/data-portal/waitForContainers.sh"]
-    networks:
-      - devnet
-    volumes:
-      - ./scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
-    environment:
-      - NODE_ENV=dev
-      - MOCK_STORE=true
-      - APP=dev
-      - GDC_SUBPATH=http://revproxy-service/api/v0/submission/
-    depends_on:
-      - postgres
-      - peregrine-service
-      - sheepdog-service
+  # portal-service:
+  #   image: "quay.io/cdis/data-portal:master"
+  #   container_name: portal-service
+  #   command: ["bash", "/var/www/data-portal/waitForContainers.sh"]
+  #   networks:
+  #     - devnet
+  #   volumes:
+  #     - ./scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
+  #   environment:
+  #     - NODE_ENV=dev
+  #     - MOCK_STORE=true
+  #     - APP=dev
+  #     - GDC_SUBPATH=http://revproxy-service/api/v0/submission/
+  #   depends_on:
+  #     - postgres
+  #     - peregrine-service
+  #     - sheepdog-service
   revproxy-service:
     image: "nginx:1.14"
     container_name: revproxy-service
