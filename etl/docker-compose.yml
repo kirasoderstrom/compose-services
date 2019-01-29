@@ -66,6 +66,7 @@ services:
     depends_on:
       - postgres
       - esproxy-service
+    restart: always
 
 
   # etl-service:

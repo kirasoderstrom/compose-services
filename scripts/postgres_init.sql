@@ -1,4 +1,4 @@
-/* Entrypoint script for postgres container to set up databases and users for 
+/* Entrypoint script for postgres container to set up databases and users for
 docker-compose setup */
 
 CREATE DATABASE metadata_db;
@@ -20,3 +20,7 @@ ALTER USER sheepdog_user WITH SUPERUSER;
 CREATE USER indexd_user;
 ALTER USER indexd_user WITH PASSWORD 'indexd_pass';
 ALTER USER indexd_user WITH SUPERUSER;
+
+CREATE USER etl_user;
+ALTER USER etl_user WITH PASSWORD 'etl_pass';
+ALTER USER etl_user WITH SUPERUSER;
