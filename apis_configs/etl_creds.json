@@ -1,7 +1,6 @@
 {
     "db_host": "postgres",
-    "db_username": "sheepdog_user",
-    "db_password": "sheepdog_pass",
+    "db_username": "etl_user",
+    "db_password": "etl_pass",
     "db_database": "metadata_db"
   }
-  

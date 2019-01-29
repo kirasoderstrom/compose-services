@@ -48,20 +48,98 @@ def test_delete_program(submission_client):
     print('delete response >{}<'.format(submission_client.delete_program(program_name)))
 
 
-
-
-def test_create_program_project(submission_client):
-    program_name = 'smmart'
+def create_program(submission_client, program_name):
     program = SN(name=program_name, dbgap_accession_number=program_name, type='program').__dict__
     response = json.loads(submission_client.create_program(program))
     assert 'id' in response, 'could not create program {}'.format(response['message'])
-    program_id = response['id']
-    project_name = 'atac'
+    return response
+
+
+def create_project(submission_client, program_name, project_name):
     project = SN(name=project_name,
         state="open", availability_type="Open",
         dbgap_accession_number=project_name, code=project_name, type='project').__dict__
     response = json.loads(submission_client.create_project(program_name, project))
-    print(response)
+    assert response['code']==200 , 'could not create project {}'.format(response['message'])
+    return response
+
+
+def create_node(submission_client, program_name, project_code, node):
+    response = json.loads(submission_client.submit_node(program_name, project_code, node))
+    assert response['code']==200 , 'could not create {} {}'.format(node['type'], response['message'])
+    return response
+
+
+
+def create_experiment(submission_client, program_name, project_code, submitter_id):
+    experiment = {
+        '*projects': {'code': project_code},
+        '*submitter_id': submitter_id,
+        'type': 'experiment'
+    }
+    return create_node(submission_client, program_name, project_code, experiment)
+
+
+def create_case(submission_client, program_name, project_code, submitter_id):
+    case = {
+        '*experiments': {'submitter_id': project_code},
+        '*submitter_id': submitter_id,
+        'type': 'case'
+    }
+    return create_node(submission_client, program_name, project_code, case)
+
+
+def create_sample(submission_client, program_name, project_code, case_name, submitter_id):
+    sample = {
+        '*cases': {'submitter_id': case_name},
+        '*submitter_id': submitter_id,
+        'type': 'sample'
+    }
+    return create_node(submission_client, program_name, project_code, sample)
+
+
+def create_aliquot(submission_client, program_name, project_code, sample_name, submitter_id):
+    aliquot = {
+        '*samples': {'submitter_id': sample_name},
+        '*submitter_id': submitter_id,
+        'type': 'aliquot'
+    }
+    return create_node(submission_client, program_name, project_code, aliquot)
+
+
+def create_submitted_methylation(submission_client, program_name, project_code, aliquot_name, submitter_id):
+    submitted_methylation = {
+      "*data_category": 'Methylation Data',
+      "*data_format": 'IDAT',
+      "type": "submitted_methylation",
+      "*submitter_id": submitter_id,
+      "*data_type": 'Methylation Intensity Values',
+      "*md5sum": '12345678901234567890123456789012',
+      "*file_size": 1000,
+      "aliquots": {
+        "submitter_id": aliquot_name
+      },
+      'urls': 'foo',
+      "*file_name": 'my-file-name',
+    }
+    return create_node(submission_client, program_name, project_code, submitted_methylation)
+
+
+def test_create_program_project(submission_client):
+    program_name = 'smmart'
+    project_name = 'atac'
+    case_name = 'case-1'
+    sample_name = 'sample-1'
+    aliquot_name = 'aliquot-1'
+    submitted_methylation_name = 'submitted_methylation-1'
+    program = create_program(submission_client, program_name)
+    project = create_project(submission_client, program_name, project_name)
+    experiment = create_experiment(submission_client, program_name, project_name, submitter_id=project_name)
+    case = create_case(submission_client, program_name, project_name, submitter_id=case_name)
+    sample = create_sample(submission_client, program_name, project_name, case_name, submitter_id=sample_name)
+    aliquot = create_aliquot(submission_client, program_name, project_name, sample_name, submitter_id=aliquot_name)
+    submitted_methylation = create_submitted_methylation(submission_client, program_name, project_name, aliquot_name, submitter_id=submitted_methylation_name)
+    print(submitted_methylation)
 
 
 
@@ -78,6 +156,23 @@ def test_query_project(submission_client):
 
 
 def test_delete_all_programs(submission_client):
+    types = ['submitted_methylation', 'aliquot', 'sample', 'case', 'experiment']
+    json.loads(submission_client.delete_node('smmart', 'atac', '9789c4f9-e527-4d9b-854e-dbfca003f25e'))
+    for t in types:
+        # try:
+        print('fetching', t)
+        response = submission_client.export_node_all_type("smmart", "atac", t)
+        if 'data' not in response:
+            print('no data?', response)
+        else:
+            for n in response['data']:
+                print(t, n['node_id'])
+                delete_response = json.loads(submission_client.delete_node('smmart', 'atac', n['node_id']))
+                assert delete_response['code'] == 200, delete_response
+                print('deleted {} {}'.format(t, n['node_id']))
+        # except Exception as e:
+        #     print('error deleting {} {}'.format(t, str(e)))
+        #     raise e
     print(submission_client.delete_project('smmart', 'atac'))
     print(submission_client.delete_program('smmart'))
 

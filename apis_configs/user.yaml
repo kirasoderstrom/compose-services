@@ -8,9 +8,88 @@ users:
   test:
     admin: True
     projects:
-    - auth_id: atac
+    - auth_id: smmart
       privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
-
+    # - auth_id: ccle
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:HAEMATOPOIETIC_AND_LYMPHOID_TISSUE
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:CENTRAL_NERVOUS_SYSTEM
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:PROSTATE
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:STOMACH
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:URINARY_TRACT
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:SKIN
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:OVARY
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:KIDNEY
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:THYROID
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:UVEA
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:SOFT_TISSUE
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:SALIVARY_GLAND
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:LUNG
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:BONE
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:PLEURA
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:ENDOMETRIUM
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:PANCREAS
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:BREAST
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:UPPER_AERODIGESTIVE_TRACT
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:FIBROBLAST
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:LARGE_INTESTINE
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:CERVIX
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:LIVER
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:AUTONOMIC_GANGLIA
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:OESOPHAGUS
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:BILIARY_TRACT
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:BUCCAL
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:SMALL_INTESTINE
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:PLACENTA
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:TESTIS
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:ENGINEERED
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:ADRENAL_CORTEX
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:VULVA
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:HEAD_AND_NECK
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:NERVOUS_SYSTEM
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:BLADDER
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:ESOPHAGUS
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:GASTROINTESTINAL_TRACT
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
+    # - auth_id: CCLE:MATCHED_NORMAL_TISSUE
+    #   privilege: ['create', 'read', 'update', 'delete', 'upload', read-storage]
 
   brian@bwalsh.com:
     admin: True

@@ -2,7 +2,11 @@ version: "3.0"
 services:
   portal-service:
     # image: "quay.io/cdis/data-portal:master"
-    build: data-portal/data-portal
+    build:
+        context: data-portal/data-portal
+        dockerfile: Dockerfile-development
+        args:
+          KIBANA_WRAPPER_URL: /kibana/app/kibana#/dashboard/4d1f2b50-1b76-11e9-a7f6-f99f8f17749e?embed=true&_g=()
     container_name: portal-service
     command: ["bash", "/var/www/data-portal/waitForContainers.sh"]
     networks:
@@ -17,6 +21,8 @@ services:
       - GDC_SUBPATH=http://revproxy-service/api/v0/submission/
       # watch the /data-portal/src directory
       - WEBPACK_WATCH="True"
+      - KIBANA_WRAPPER_URL=/kibana/app/kibana#/dashboard/755eff90-2257-11e9-83b4-275563552488?embed=true&_g=()
+
     depends_on:
       - postgres
       - peregrine-service
