@@ -1,0 +1,25 @@
+version: "3.0"
+services:
+  portal-service:
+    # image: "quay.io/cdis/data-portal:master"
+    build: data-portal/data-portal
+    container_name: portal-service
+    command: ["bash", "/var/www/data-portal/waitForContainers.sh"]
+    networks:
+      - devnet
+    volumes:
+      - ./data-portal/data-portal/src:/data-portal/src
+      - ./scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
+    environment:
+      - NODE_ENV=dev
+      - MOCK_STORE=true
+      - APP=dev
+      - GDC_SUBPATH=http://revproxy-service/api/v0/submission/
+      # watch the /data-portal/src directory
+      - WEBPACK_WATCH="True"
+    depends_on:
+      - postgres
+      - peregrine-service
+      - sheepdog-service
+networks:
+  devnet:

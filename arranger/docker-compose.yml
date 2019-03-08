@@ -1,0 +1,37 @@
+
+version: "3.0"
+
+services:
+  arranger-service:
+    image: quay.io/cdis/arranger:master
+    container_name: arranger-service
+    ports:
+      - "5050:5050"
+    environment:
+      ES_HOST: "esproxy-service:9200"
+    networks:
+      - devnet
+    depends_on:
+      - esproxy-service
+    # volumes:
+      # # https://github.com/docker/compose/issues/2289
+      # # The order of the files changing the working directory is by design. The first file is always the base and the following files are applied over it in the order they are included
+      # - ./arranger/wait-for:/usr/bin/wait-for
+    # command: ["/bin/sh", "-c", "wait-for esproxy-service:9200 ; npm run run-prod"]
+
+  arranger-dashboard:
+    image: quay.io/cdis/arranger-dashboard:master
+    container_name: arranger-dashboard-service
+    ports:
+      - "6060:6060"
+    environment:
+      ES_HOST: "esproxy-service:9200"
+      ARRANGER_API: "arranger-service:5050"
+    networks:
+      - devnet
+    depends_on:
+      - esproxy-service
+      - arranger-service
+
+networks:
+  devnet:

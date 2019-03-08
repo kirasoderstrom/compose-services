@@ -22,12 +22,14 @@ services:
     environment:
       - SERVER_NAME=kibana-service
       - ELASTICSEARCH_URL=http://esproxy-service:9200
+      - SERVER_BASEPATH=/kibana
     ports:
       - 5601:5601
     networks:
       - compose-services_devnet
     depends_on:
       - esproxy-service
+
   tube-service:
     image: "quay.io/cdis/tube:master"
     container_name: tube-service
@@ -58,8 +60,26 @@ services:
     networks:
       - compose-services_devnet
     environment:
-      - HADOOP_URL=hdfs://0.0.0.0:9000
-      - HADOOP_HOST=0.0.0.0
+      DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+    depends_on:
+      - postgres
+      - esproxy-service
+
+
+  etl-service:
+    image: "gen3-etl-lite:latest"
+    container_name: etl-service
+    networks:
+      - devnet
+    volumes:
+      - ./apis_configs/sheepdog_creds.json:/gen3_replicator/creds.json
+      - ./example-schemas:/schemas_dir
+    environment:
+      DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+    depends_on:
+      - postgres
+      - esproxy-service
+
 networks:
   compose-services_devnet:
     external: true

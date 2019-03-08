@@ -10,3 +10,5 @@ Secrets/
 *.pytest_cache
 *.cache
 *pyc
+tests/__pycache__/
+gen3-etl-lite/
