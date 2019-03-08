@@ -8,9 +8,9 @@ project: '*'
 category: administrative
 description: >
   Any specifically defined piece of work that is undertaken or attempted to meet a single
-  requirement. (NCIt C47885)
+  requirement. (NCIt C47885) XXXX
 additionalProperties: false
-submittable: true 
+submittable: true
 validators: null
 
 systemProperties:
@@ -21,8 +21,8 @@ systemProperties:
   - intended_release_date
 
 required:
-  - code 
-  - name 
+  - code
+  - name
   - programs
 
 uniqueKeys:

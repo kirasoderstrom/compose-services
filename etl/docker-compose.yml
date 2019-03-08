@@ -31,10 +31,16 @@ services:
     depends_on:
       - esproxy-service
 
+<<<<<<< HEAD
   tube-service:
     image: "quay.io/cdis/tube:master"
     container_name: tube-service
     command: bash -c "while true; do sleep 5; done"
+=======
+  replicator-service:
+    image: "gen3_replicator:latest"
+    container_name: replicator-service
+>>>>>>> wip
     networks:
       - compose-services_devnet
     environment:
