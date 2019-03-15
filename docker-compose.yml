@@ -36,6 +36,8 @@ services:
       retries: 3
     depends_on:
       - postgres
+    environment:
+      - GEN3_DEBUG=True
   fence-service:
     image: "quay.io/cdis/fence:master"
     command: bash /var/www/fence/fence_setup.sh
@@ -67,7 +69,7 @@ services:
     networks:
       - devnet
     environment:
-      - JWKS_ENDPOINT="http://fence-service/.well-known/jwks"
+      - JWKS_ENDPOINT=http://fence-service/.well-known/jwks
     depends_on:
       - fence-service
   peregrine-service:
@@ -181,6 +183,19 @@ services:
       - fence-service
       - portal-service
       - pidgin-service
+#      - mock-workspace-service
+
+  # mock-workspace-service:
+  #   build:
+  #     context: ./mock-workspace
+  #   container_name: mock-workspace-service
+  #   networks:
+  #     - devnet
+  #   ports:
+  #     - "5000:5000"
+  #   depends_on:
+  #     - fence-service
+
 networks:
   devnet:
 volumes:
