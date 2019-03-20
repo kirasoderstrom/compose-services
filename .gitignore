@@ -14,3 +14,5 @@ tests/__pycache__/
 gen3-etl-lite/
 temp_creds/
 temp_keys/
+
+s3indexer

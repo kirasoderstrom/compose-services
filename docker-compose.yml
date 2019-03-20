@@ -20,6 +20,8 @@ services:
     #  - 5432:5432
   indexd-service:
     image: "quay.io/cdis/indexd:master"
+    # build:
+    #   context: indexd
     command: bash indexd_setup.sh
     container_name: indexd-service
     networks:
@@ -195,6 +197,20 @@ services:
   #     - "5000:5000"
   #   depends_on:
   #     - fence-service
+
+
+  s3indexer-service:
+    # build:
+    #   context: s3indexer
+    image: indexs3client:s3-endpoint
+    container_name: s3indexer-service
+    volumes:
+      - ./Secrets/s3indexer-state:/var/s3indexer/state
+      - ./Secrets/fence-config.yaml:/var/s3indexer/fence-config.yaml
+    networks:
+      - devnet
+    depends_on:
+      - indexd-service
 
 networks:
   devnet:
