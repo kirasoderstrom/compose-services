@@ -41,7 +41,8 @@ services:
     environment:
       - GEN3_DEBUG=True
   fence-service:
-    image: "quay.io/cdis/fence:master"
+    # image: "quay.io/cdis/fence:master"
+    image: "fence:s3-endpoint"
     command: bash /var/www/fence/fence_setup.sh
     container_name: fence-service
     networks:
@@ -198,11 +199,9 @@ services:
   #   depends_on:
   #     - fence-service
 
-
+  # replacement for SQS S3 Job Dispatcher https://github.com/uc-cdis/ssjdispatcher
   s3indexer-service:
-    # build:
-    #   context: s3indexer
-    image: indexs3client:s3-endpoint
+    image: s3indexer
     container_name: s3indexer-service
     volumes:
       - ./Secrets/s3indexer-state:/var/s3indexer/state
