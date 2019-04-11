@@ -1,18 +1,23 @@
 version: '3'
 services:
   postgres:
-    image: postgres:9.6
+    # image: postgres:9.6
+    build:
+      context: postgres
     networks:
       - devnet
     volumes:
       - "psqldata:/var/lib/postgresql/data"
       - "./scripts/postgres_init.sql:/docker-entrypoint-initdb.d/postgres_init.sql"
+      - ./postgres/postgres.conf:/etc/postgresql.conf
+      - ./postgres/pg_hba.conf:/etc/pg_hba.conf
     restart: unless-stopped
     healthcheck:
         test: ["CMD-SHELL", "psql -U fence_user -d fence_db -c 'SELECT 1;'"]
         interval: 60s
         timeout: 5s
         retries: 3
+    command: postgres -c config_file=/etc/postgresql.conf -c hba_file=/etc/pg_hba.conf
     #
     # uncomment this to make postgres available from the container host - ex:
     #    psql -h localhost -d fence -U fence_user
@@ -140,16 +145,17 @@ services:
     depends_on:
       - peregrine-service
   portal-service:
-    image: "quay.io/cdis/data-portal:master"
+    image: "quay.io/cdis/data-portal:feat_guppy-explorer"
     container_name: portal-service
     command: ["bash", "/var/www/data-portal/waitForContainers.sh"]
     networks:
       - devnet
     volumes:
       - ./scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
+      - ./Secrets/portal_config.json:/data-portal/data/config/default.json
     environment:
       - NODE_ENV=dev
-      - MOCK_STORE=true
+      # - MOCK_STORE=true
       - APP=dev
       - GDC_SUBPATH=http://revproxy-service/api/v0/submission/
     healthcheck:
@@ -161,6 +167,14 @@ services:
       - postgres
       - peregrine-service
       - sheepdog-service
+  # jupyter-service:
+  #   image: "quay.io/occ_data/jupyternotebook:1.7.2"
+  #   #image: jupyter/minimal-notebook
+  #   container_name: jupyter-service
+  #   networks:
+  #     - devnet
+  #   volumes:
+  #     - ./scripts/jupyter_config.py:/home/jovyan/.jupyter/jupyter_notebook_config.py
   revproxy-service:
     image: "quay.io/cdis/nginx:1.15.5-ctds"
     container_name: revproxy-service
@@ -200,9 +214,9 @@ services:
 
 
   s3indexer-service:
-    # build:
-    #   context: s3indexer
-    image: indexs3client:s3-endpoint
+    build:
+      context: s3indexer
+    # image: indexs3client:s3-endpoint
     container_name: s3indexer-service
     volumes:
       - ./Secrets/s3indexer-state:/var/s3indexer/state

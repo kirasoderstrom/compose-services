@@ -15,8 +15,12 @@ services:
       - 9200:9200
       - 9300:9300
     networks:
-      - compose-services_devnet
-
+      - devnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   kibana-service:
     image: docker.elastic.co/kibana/kibana-oss:6.5.4
     container_name: kibana-service
@@ -27,46 +31,20 @@ services:
     ports:
       - 5601:5601
     networks:
-      - compose-services_devnet
+      - devnet
     depends_on:
       - esproxy-service
 
-<<<<<<< HEAD
-  tube-service:
-    image: "quay.io/cdis/tube:master"
-    container_name: tube-service
-    command: bash -c "while true; do sleep 5; done"
-=======
-  replicator-service:
-    image: "gen3_replicator:latest"
-    container_name: replicator-service
->>>>>>> wip
+  etl-service:
+    # image: "gen3-etl-lite:latest"
+    build:
+      context: gen3_replicator
+    container_name: etl-service
     networks:
-      - compose-services_devnet
-    environment:
-      - DICTIONARY_URL=https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-      - ES_URL=esproxy-service
-      - ES_INDEX_NAME=etl
-      - HADOOP_URL=hdfs://spark-service:9000
-      - HADOOP_HOST=spark-service
+      - devnet
     volumes:
-      - ./Secrets/etl_creds.json:/usr/share/gen3/tube/creds.json
-      - ./Secrets/etlMapping.yaml:/usr/share/gen3/tube/etlMapping.yaml
-    depends_on:
-      - spark-service
-
-  spark-service:
-    image: "quay.io/cdis/gen3-spark:master"
-    container_name: spark-service
-    command: bash -c "python run_config.py && hdfs namenode -format && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"
-    expose:
-      - 22
-      - 8030
-      - 8031
-      - 8032
-      - 9000
-    networks:
-      - compose-services_devnet
+      - ./Secrets/etl_creds.json:/config/creds.json
+      - ./example-schemas:/schemas_dir
     environment:
       DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
     depends_on:
@@ -75,20 +53,19 @@ services:
     restart: always
 
 
-  # etl-service:
-  #   image: "gen3-etl-lite:latest"
-  #   container_name: etl-service
-  #   networks:
-  #     - compose-services_devnet
-  #   volumes:
-  #     - ./apis_configs/sheepdog_creds.json:/gen3_replicator/creds.json
-  #     - ./example-schemas:/schemas_dir
-  #   environment:
-  #     DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-  #   depends_on:
-  #     - postgres
-  #     - esproxy-service
+  guppy-service:
+    image: "quay.io/cdis/guppy:feat_download-api"
+    container_name: guppy-service
+    networks:
+      - devnet
+    depends_on:
+      - esproxy-service
+    environment:
+      - GUPPY_CONFIG_FILEPATH=/guppy/guppy_config.json
+      - GEN3_ES_ENDPOINT=http://esproxy-service:9200
+      - GEN3_ARBORIST_ENDPOINT=http://arborist-service
+    volumes:
+      - ./Secrets/guppy_config.json:/guppy/guppy_config.json
 
 networks:
-  compose-services_devnet:
-    external: true
+  devnet:
