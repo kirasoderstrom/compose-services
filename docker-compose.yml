@@ -216,7 +216,7 @@ services:
   # replacement for SQS S3 Job Dispatcher https://github.com/uc-cdis/ssjdispatcher
   s3indexer-service:
     build:
-      context: s3indexer
+      context: ../gen3-s3indexer
     # image: indexs3client:s3-endpoint
     container_name: s3indexer-service
     volumes:

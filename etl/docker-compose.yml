@@ -38,7 +38,7 @@ services:
   etl-service:
     # image: "gen3-etl-lite:latest"
     build:
-      context: gen3_replicator
+      context: ../gen3_replicator
     container_name: etl-service
     networks:
       - devnet
@@ -54,7 +54,7 @@ services:
 
 
   guppy-service:
-    image: "quay.io/cdis/guppy:feat_download-api"
+    image: "quay.io/cdis/guppy"
     container_name: guppy-service
     networks:
       - devnet
