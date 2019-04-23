@@ -47,7 +47,8 @@ services:
       - GEN3_DEBUG=True
   fence-service:
     # image: "quay.io/cdis/fence:master"
-    image: "fence:s3-endpoint"
+    build:
+        context: ../fence
     command: bash /var/www/fence/fence_setup.sh
     container_name: fence-service
     networks:
