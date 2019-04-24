@@ -25,8 +25,6 @@ services:
     #  - 5432:5432
   indexd-service:
     image: "quay.io/cdis/indexd:master"
-    # build:
-    #   context: indexd
     command: bash indexd_setup.sh
     container_name: indexd-service
     networks:
@@ -46,9 +44,7 @@ services:
     environment:
       - GEN3_DEBUG=True
   fence-service:
-    # image: "quay.io/cdis/fence:master"
-    build:
-        context: ../fence
+    image: "ohsucompbio/fence:s3-endpoint"
     command: bash /var/www/fence/fence_setup.sh
     container_name: fence-service
     networks:
@@ -216,9 +212,7 @@ services:
 
   # replacement for SQS S3 Job Dispatcher https://github.com/uc-cdis/ssjdispatcher
   s3indexer-service:
-    build:
-      context: ../gen3-s3indexer
-    # image: indexs3client:s3-endpoint
+    image: "ohsucompbio/gen3-s3indexer:s3-endpoint"
     container_name: s3indexer-service
     volumes:
       - ./Secrets/s3indexer-state:/var/s3indexer/state

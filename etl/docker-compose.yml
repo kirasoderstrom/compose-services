@@ -36,9 +36,7 @@ services:
       - esproxy-service
 
   etl-service:
-    # image: "gen3-etl-lite:latest"
-    build:
-      context: ../gen3_replicator
+    image: "ohsucompbio/gen3_replicator:s3-endpoint"
     container_name: etl-service
     networks:
       - devnet
