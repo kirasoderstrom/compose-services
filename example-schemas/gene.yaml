@@ -1,0 +1,85 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "gene"
+title: Gene
+type: object
+category: reference
+program: '*'
+project: '*'
+description: >
+  Gene
+additionalProperties: false
+submittable: false
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - created_datetime
+  - updated_datetime
+  - state
+
+required:
+  - gene_id
+
+uniqueKeys:
+  - [ id ]
+  - [ project_id, submitter_id ]
+
+links:
+  - name: projects
+    backref: genes
+    label: belongs_to
+    target_type: project
+    multiplicity: many_to_one
+    required: false
+
+
+properties:
+  gene_id:
+    type: string
+  symbol:
+    type: string
+  description:
+    type: string
+  chromosome:
+    type: string
+  start:
+    type: integer
+  end:
+    type: integer
+  strand:
+    type: string
+  genome:
+    type: string
+
+  submitter_id:
+    type:
+    - string
+  project_id:
+    $ref: _definitions.yaml#/project_id
+  projects:
+    $ref: "_definitions.yaml#/to_one"
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  id:
+    $ref: _definitions.yaml#/UUID
+    systemAlias: node_id
+
+required:
+- submitter_id
+
+submittable: true
+systemProperties:
+- id
+- project_id
+- created_datetime
+- updated_datetime
+- state
+uniqueKeys:
+- - id
+- - project_id
+  - submitter_id
+validators: null

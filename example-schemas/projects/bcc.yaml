@@ -1,0 +1,21 @@
+#####################################################################
+# Project 1 specific overrides
+#####################################################################
+
+$schema: "http://json-schema.org/draft-04/schema#"
+
+#####################################################################
+# Aliquot
+#####################################################################
+
+id: "aliquot"
+program: 'smmart'
+project: 'bcc'
+required:
+  - submitter_aliquot_id
+  - parents
+  - foo
+
+properties:
+  foo:
+    type: string

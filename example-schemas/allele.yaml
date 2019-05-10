@@ -1,0 +1,93 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "allele"
+title: Allele
+type: object
+category: reference
+program: '*'
+project: '*'
+description: >
+  Allele
+additionalProperties: false
+submittable: false
+validators: null
+
+
+links:
+  - name: submitted_files
+    backref: alleles
+    label: derived_from
+    multiplicity: many_to_many
+    target_type: submitted_file
+    required: false
+  - name: aliquots
+    backref: alleles
+    label: derived_from
+    multiplicity: many_to_many
+    target_type: aliquot
+    required: false
+  - name: genes
+    backref: gene
+    label: in
+    target_type: gene
+    multiplicity: many_to_one
+    required: false
+
+properties:
+  aliquots:
+    $ref: "_definitions.yaml#/to_many"
+  submitted_files:
+    $ref: "_definitions.yaml#/to_many"
+  submitter_id:
+    type:
+    - string
+    - 'null'
+  project_id:
+    $ref: _definitions.yaml#/project_id
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  gene:
+    $ref: "_definitions.yaml#/to_one"
+
+  alternate_bases:
+    type: string
+  chromosome:
+    type: string
+  dbSNP_RS:
+    type: string
+  effect:
+    type: string
+  end:
+    type: integer
+  ensembl_transcript:
+    type: string
+  genome:
+    type: string
+  hugo_symbol:
+    type: string
+  reference_bases:
+    type: string
+  start:
+    type: integer
+  strand:
+    type: string
+  type:
+    type: string
+
+required:
+- submitter_id
+submittable: true
+systemProperties:
+- id
+- project_id
+- created_datetime
+- updated_datetime
+title: Allele
+type: object
+uniqueKeys:
+- - id
+- - project_id
+  - submitter_id
+validators: null

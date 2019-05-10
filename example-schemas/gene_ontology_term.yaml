@@ -1,0 +1,83 @@
+$schema: http://json-schema.org/draft-04/schema#
+additionalProperties: false
+category: reference
+description: 'See http://geneontology.org/
+  '
+id: "gene_ontology_term"
+links:
+  - name: gene
+    backref: ontology_term
+    label: annotations
+    target_type: gene
+    multiplicity: many_to_many
+    required: false
+  - name: children
+    backref: parents
+    label: isa
+    target_type: gene_ontology_term
+    multiplicity: many_to_many
+    required: false
+
+
+namespace: http://gdc.nci.nih.gov
+program: '*'
+project: '*'
+properties:
+  _id:
+    type:
+    - 'null'
+    - string
+  created_datetime:
+    $ref: _definitions.yaml#/datetime
+  id:
+    $ref: _definitions.yaml#/UUID
+    systemAlias: node_id
+  project_id:
+    $ref: _definitions.yaml#/project_id
+  state:
+    $ref: _definitions.yaml#/state
+  submitter_id:
+    type: string
+  updated_datetime:
+    $ref: _definitions.yaml#/datetime
+  parents:
+    $ref: "_definitions.yaml#/to_many"
+  children:
+    $ref: "_definitions.yaml#/to_many"
+  gene:
+    $ref: "_definitions.yaml#/to_many"
+
+  definition:
+    type: string
+  go_id:
+    type: string
+  name:
+    type: string
+  namespace:
+    type: string
+  synonym:
+    items:
+      type: string
+    type: array
+  xref:
+    items:
+      type: string
+    type: array
+
+
+required:
+- submitter_id
+submittable: true
+systemProperties:
+- id
+- project_id
+- created_datetime
+- updated_datetime
+- state
+title: Gene Ontology Term
+type: object
+uniqueKeys:
+- - id
+- - project_id
+  - submitter_id
+validators: null

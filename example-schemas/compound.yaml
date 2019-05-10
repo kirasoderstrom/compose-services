@@ -1,0 +1,57 @@
+$schema: http://json-schema.org/draft-04/schema#
+additionalProperties: false
+category: administrative
+description: 'The default object schema
+
+  '
+id: compound
+mappings: null
+namespace: http://gdc.nci.nih.gov
+program: '*'
+project: '*'
+
+links: []
+
+properties:
+  submitter_id:
+    type:
+    - string
+    - 'null'
+  name:
+    type: string
+  term:
+    type: string
+  term_id:
+    type: string
+
+  type:
+    type: string
+  id:
+    $ref: _definitions.yaml#/UUID
+    systemAlias: node_id
+  project_id:
+    $ref: _definitions.yaml#/project_id
+  state:
+    $ref: _definitions.yaml#/state
+  created_datetime:
+    $ref: _definitions.yaml#/datetime
+  updated_datetime:
+    $ref: _definitions.yaml#/datetime
+
+
+required:
+- submitter_id
+submittable: true
+systemProperties:
+- id
+- project_id
+- created_datetime
+- updated_datetime
+- state
+title: compound
+type: object
+uniqueKeys:
+- - id
+- - project_id
+  - submitter_id
+validators: null

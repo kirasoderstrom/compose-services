@@ -1,0 +1,77 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "drug_response"
+title: DrugResponse
+type: object
+category: genomic
+program: '*'
+project: '*'
+description: >
+  Drug Response
+additionalProperties: false
+submittable: false
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - created_datetime
+  - updated_datetime
+  - state
+
+links:
+  - name: aliquots
+    label: derived_from
+    target_type: aliquot
+    multiplicity: many_to_one
+    required: false
+    backref: drug_responses
+
+required:
+  - type
+  - submitter_id
+  - aliquots
+
+properties:
+  id:
+    $ref: "_definitions.yaml#/UUID"
+  project_id:
+    $ref: "_definitions.yaml#/project_id"
+  submitter_id:
+    type: string
+  aliquots:
+    $ref: "_definitions.yaml#/to_one"
+  project_id:
+    $ref: "_definitions.yaml#/project_id"
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  state:
+    $ref: "_definitions.yaml#/state"
+  type:
+    enum: [ "drug_response" ]
+
+  source:
+    type: string
+  doses_um:
+    type: array
+    items: float
+  activity_data:
+    type: array
+    items: float
+  activity_sd:
+    type: array
+    items: float
+  num_data:
+    type: float
+  fit_type:
+    type: float
+  ec50:
+    type: float
+  ic50:
+    type: float
+  amax:
+    type: float
+  act_area:
+    type: float

@@ -1,0 +1,62 @@
+$schema: http://json-schema.org/draft-04/schema#
+additionalProperties: false
+category: reference
+description: 'The default object schema
+
+  '
+id: phenotype
+
+links:
+  - name: projects
+    backref: phenotypes
+    label: belongs_to
+    target_type: project
+    multiplicity: many_to_one
+    required: false
+
+namespace: http://gdc.nci.nih.gov
+program: '*'
+project: '*'
+
+properties:
+  id:
+    $ref: _definitions.yaml#/UUID
+    systemAlias: node_id
+  created_datetime:
+    $ref: _definitions.yaml#/datetime
+  project_id:
+    $ref: _definitions.yaml#/project_id
+  state:
+    $ref: _definitions.yaml#/state
+  submitter_id:
+    type:
+    - string
+    - 'null'
+  type:
+    type: string
+  updated_datetime:
+    $ref: _definitions.yaml#/datetime
+
+  name:
+    type: string
+  term:
+    type: string
+  term_id:
+    type: string
+
+required:
+- submitter_id
+submittable: true
+systemProperties:
+- id
+- project_id
+- created_datetime
+- updated_datetime
+
+title: Phenotype
+type: object
+uniqueKeys:
+- - id
+- - project_id
+  - submitter_id
+validators: null
