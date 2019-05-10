@@ -26,7 +26,7 @@ required:
 
 uniqueKeys:
   - [id]
-  - [project_id, submitter_id]
+  - [submitter_id]
 
 links:
   - name: samples

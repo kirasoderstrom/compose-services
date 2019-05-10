@@ -21,8 +21,8 @@ services:
     #
     # uncomment this to make postgres available from the container host - ex:
     #    psql -h localhost -d fence -U fence_user
-    #ports:
-    #  - 5432:5432
+    ports:
+     - 5432:5432
   indexd-service:
     image: "quay.io/cdis/indexd:master"
     command: bash indexd_setup.sh
@@ -51,10 +51,6 @@ services:
       - devnet
     volumes:
       - ./Secrets/fence-config.yaml:/var/www/fence/fence-config.yaml
-      #- ./Secrets/fence_settings.py:/var/www/fence/local_settings.py
-      #- ./Secrets/fence_creds.json:/var/www/fence/creds.json
-      #- ./Secrets/config_helper.py:/var/www/fence/config_helper.py
-      #- ./Secrets/fence_credentials.json:/var/www/fence/fence_credentials.json
       - ./Secrets/user.yaml:/var/www/fence/user.yaml
       - ./Secrets/TLS/service.crt:/usr/local/share/ca-certificates/cdis-ca.crt
       - ./Secrets/fenceJwtKeys:/fence/keys
@@ -109,7 +105,7 @@ services:
       - postgres
       - sheepdog-service
   sheepdog-service:
-    image: "quay.io/cdis/sheepdog:master"
+    image: "ohsucompbio/fence:cross-project-graphs"  # "quay.io/cdis/sheepdog:master"
     command: bash /sheepdog_setup.sh
     container_name: sheepdog-service
     networks:
@@ -143,7 +139,9 @@ services:
     depends_on:
       - peregrine-service
   portal-service:
-    image: "quay.io/cdis/data-portal:feat_guppy-explorer"
+    image: "quay.io/cdis/data-portal:latest"
+    # build:
+    #   context: data-portal
     container_name: portal-service
     command: ["bash", "/var/www/data-portal/waitForContainers.sh"]
     networks:
@@ -152,10 +150,13 @@ services:
       - ./scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
       - ./Secrets/portal_config.json:/data-portal/data/config/default.json
     environment:
+      # this seems to be overridden within the container
       - NODE_ENV=dev
       # - MOCK_STORE=true
       - APP=dev
       - GDC_SUBPATH=http://revproxy-service/api/v0/submission/
+      # ohsu change to container to bring up portal in dev mode
+      - WEBPACK_WATCH=true
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost"]
       interval: 60s

@@ -44,7 +44,8 @@ services:
       - ./Secrets/etl_creds.json:/config/creds.json
       - ./example-schemas:/schemas_dir
     environment:
-      DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+      # DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+      PATH_TO_SCHEMA_DIR: /schemas_dir
     depends_on:
       - postgres
       - esproxy-service
