@@ -1,0 +1,104 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "somatic_variant"
+title: SomaticVariant
+type: object
+category: genomic
+program: '*'
+project: '*'
+description: >
+  A somatic variant edge
+additionalProperties: false
+submittable: true
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - created_datetime
+  - updated_datetime
+
+required:
+  - submitter_id
+  - type
+
+uniqueKeys:
+  - [id]
+  - [project_id, submitter_id]
+
+# edge:
+#   label: somatic_variant
+#   from: aliquot
+#   to: allele_id
+
+links:
+  - name: aliquot
+    backref: somatic_variants
+    label: belongs_to
+    target_type: aliquot
+    multiplicity: one_to_many
+    required: false
+  # - name: transcript
+  #   backref: somatic_variants
+  #   label: belongs_to
+  #   target_type: ensembl_transcript
+  #   multiplicity: one_to_many
+  #   required: false
+  - name: allele
+    backref: somatic_variants
+    label: belongs_to
+    target_type: allele
+    multiplicity: one_to_many
+    required: false
+
+
+
+properties:
+  type:
+    type: string
+  id:
+    $ref: "_definitions.yaml#/UUID"
+    systemAlias: node_id
+  aliquot:
+    $ref: "_definitions.yaml#/to_one"
+  transcript:
+    $ref: "_definitions.yaml#/to_one"
+  allele:
+    $ref: "_definitions.yaml#/to_one"
+
+
+  project_id:
+    $ref: "_definitions.yaml#/project_id"
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  submitter_id:
+    type:
+      - string
+      - "null"
+  ref:
+    type: string
+  alt:
+    type: string
+  t_depth:
+    type: integer
+  t_ref_count:
+    type: integer
+  t_alt_count:
+    type: integer
+  n_depth:
+    type: integer
+  n_ref_count:
+    type: integer
+  n_alt_count:
+    type: integer
+  filter:
+    type: string
+  methods:
+    type: array
+    items: array
+  ensembl_transcript:
+    type: string
+  ensembl_gene:
+    type: string

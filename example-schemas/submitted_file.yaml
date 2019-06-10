@@ -34,6 +34,12 @@ links:
     target_type: project
     multiplicity: many_to_one
     required: false
+  - name: cases
+    backref: submitted_files
+    label: data_for
+    target_type: case
+    multiplicity: many_to_one
+    required: false
 
 
 required:
@@ -74,4 +80,6 @@ properties:
   aliquots:
     $ref: "_definitions.yaml#/to_one"
   projects:
+    $ref: "_definitions.yaml#/to_one"
+  cases:
     $ref: "_definitions.yaml#/to_one"

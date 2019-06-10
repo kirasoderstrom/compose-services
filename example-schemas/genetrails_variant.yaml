@@ -20,6 +20,12 @@ properties:
     - string
   aliquot:
     $ref: _definitions.yaml#/to_one
+
+  submitter_id:
+    type:
+    - 'null'
+    - string
+        
   assay_version:
     type:
     - string
@@ -121,6 +127,9 @@ properties:
     type:
     - string
     - 'null'
+  project_id:
+    $ref: _definitions.yaml#/project_id
+
 required:
 - submitter_id
 - project_id
@@ -131,7 +140,7 @@ systemProperties:
 - created_datetime
 - updated_datetime
 - state
-title: GenetrailsVariant
+title: BccGenetrailsVariant
 type: object
 uniqueKeys:
 - - id
