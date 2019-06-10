@@ -44,7 +44,7 @@ services:
     environment:
       - GEN3_DEBUG=True
   fence-service:
-    image: "ohsucompbio/fence:s3-endpoint"
+    image: "ohsucompbio/fence:s3-endpoint-jwt"
     command: bash /var/www/fence/fence_setup.sh
     container_name: fence-service
     networks:
@@ -149,6 +149,7 @@ services:
     volumes:
       - ./scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
       - ./Secrets/portal_config.json:/data-portal/data/config/default.json
+      - ./scripts/portal-nginx.conf:/etc/nginx/conf.d/nginx.conf
     environment:
       # this seems to be overridden within the container
       - NODE_ENV=dev
@@ -198,18 +199,6 @@ services:
       - fence-service
       - portal-service
       - pidgin-service
-#      - mock-workspace-service
-
-  # mock-workspace-service:
-  #   build:
-  #     context: ./mock-workspace
-  #   container_name: mock-workspace-service
-  #   networks:
-  #     - devnet
-  #   ports:
-  #     - "5000:5000"
-  #   depends_on:
-  #     - fence-service
 
   # replacement for SQS S3 Job Dispatcher https://github.com/uc-cdis/ssjdispatcher
   s3indexer-service:
