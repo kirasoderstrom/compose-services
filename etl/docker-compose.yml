@@ -1,33 +1,70 @@
 version: '3'
 services:
+
+  # https://aws.amazon.com/blogs/opensource/json-web-tokens-jwt-authenticate-open-distro-for-elasticsearch-kibana/
+  # https://opendistro.github.io/for-elasticsearch-docs/docs/security/openid-connect/
+  # https://sematext.com/blog/open-distro-elasticsearch-review
+  #  Cookie access_token=
+  #  http://fence-service/.well-known/jwks
+  #  username = id_token_claims["context"]["user"]["name"]
+  # https://ashishchaudhary.in/rewriting-jwt-from-cookies-to-authorization-header
+
+# dc exec esproxy-service plugins/opendistro_security/tools/securityadmin.sh -f plugins/opendistro_security/securityconfig/config.yml -icl -nhnv -cert config/kirk.pem -cacert config/root-ca.pem -key config/kirk-key.pem -t config
+
+# curl -XGET -k https://localhost:9200/_opendistro/_security/authinfo\?pretty -H "Authorization: Bearer XXXX"
+
+
+
   esproxy-service:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.5.4
+    # image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.5.4
+    image: amazon/opendistro-for-elasticsearch:0.9.0
     container_name: esproxy-service
     environment:
       - cluster.name=elasticsearch-cluster
       - bootstrap.memory_lock=false
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      # - opendistro_security.disabled=true
+      # - opendistro_security.ssl.http.enabled=false
     ulimits:
       memlock:
         soft: -1
         hard: -1
+    # volumes:
+      # - ./setup-ssl/root-ca.pem:/usr/share/elasticsearch/config/root-ca.pem
+      # - ./setup-ssl/esnode.pem:/usr/share/elasticsearch/config/esnode.pem
+      # - ./setup-ssl/esnode-key.pem:/usr/share/elasticsearch/config/esnode-key.pem
+      # - ./setup-ssl/kirk.pem:/usr/share/elasticsearch/config/kirk.pem
+      # - ./setup-ssl/kirk-key.pem:/usr/share/elasticsearch/config/kirk-key.pem
+      # - ./setup-ssl/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      # - ./setup-ssl/internal_users.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml
+    volumes:
+      - ./Secrets/elasticsearch-open-distro/config.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/config.yml
     ports:
       - 9200:9200
-      - 9300:9300
+      - 9600:9600 # required for Performance Analyzer
     networks:
       - devnet
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9200"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD", "curl", "-k", "-f", "https://admin:admin@esproxy-service:9200"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+
+
+  # /usr/share/kibana/bin/kibana-plugin install https://github.com/fbaligand/kibana-enhanced-table/releases/download/v1.2.0/enhanced-table-1.2.0_6.7.1.zip
   kibana-service:
-    image: docker.elastic.co/kibana/kibana-oss:6.5.4
+    # image: docker.elastic.co/kibana/kibana-oss:6.5.4
+    # image: amazon/opendistro-for-elasticsearch-kibana:0.9.0
+    build:
+      context: kibana
     container_name: kibana-service
     environment:
       - SERVER_NAME=kibana-service
-      - ELASTICSEARCH_URL=http://esproxy-service:9200
+      - ELASTICSEARCH_URL=https://admin:admin@esproxy-service:9200
       - SERVER_BASEPATH=/kibana
+      - logging.filter.authorization=none
+    volumes:
+      - ./Secrets/elasticsearch-open-distro/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - 5601:5601
     networks:
@@ -35,17 +72,51 @@ services:
     depends_on:
       - esproxy-service
 
+
+
+# jwtproxy-service:
+#   build:
+#     context: ./jwtproxy
+#   container_name: jwtproxy-service
+#   networks:
+#     - devnet
+#   ports:
+#     - "5000:5000"
+#   volumes:
+#     - ./Secrets/fenceJwtKeys:/home/app/keys
+#   depends_on:
+#     - fence-service
+#     - esproxy-service
+#
+# revproxy-service:
+#   depends_on:
+#     - jwtproxy-service
+
+
+# 1609  dc exec esproxy-service cat /usr/share/elasticsearch/config/kirk.pem > setup-ssl/kirk.pem
+# 1610  dc exec esproxy-service cat /usr/share/elasticsearch/config/kirk-key.pem > setup-ssl/kirk-key.pem
+# 1611  dc exec esproxy-service cat /usr/share/elasticsearch/config/esnode.pem > setup-ssl/esnode.pem
+# 1612  dc exec esproxy-service cat /usr/share/elasticsearch/config/esnode-key.pem > setup-ssl/esnode-key.pem
+# 1613  dc exec esproxy-service cat /usr/share/elasticsearch/config/root-ca.pem  > setup-ssl/root-ca.pem
+# openssl s_client -showcerts -connect localhost:9200
+
+
   etl-service:
-    image: "ohsucompbio/gen3_replicator:s3-endpoint"
+    #image: "ohsucompbio/gen3_replicator:s3-endpoint"
+    build:
+      context: gen3_replicator
     container_name: etl-service
     networks:
       - devnet
     volumes:
       - ./Secrets/etl_creds.json:/config/creds.json
       - ./example-schemas:/schemas_dir
+      - ./setup-ssl:/ca_bundle
     environment:
       # DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-      PATH_TO_SCHEMA_DIR: /schemas_dir
+      - PATH_TO_SCHEMA_DIR=/schemas_dir
+      - ELASTICSEARCH_URL=https://admin:admin@esproxy-service:9200
+      - REQUESTS_CA_BUNDLE=/ca_bundle/es.cert
     depends_on:
       - postgres
       - esproxy-service
@@ -61,7 +132,7 @@ services:
       - esproxy-service
     environment:
       - GUPPY_CONFIG_FILEPATH=/guppy/guppy_config.json
-      - GEN3_ES_ENDPOINT=http://esproxy-service:9200
+      - GEN3_ES_ENDPOINT=https://admin:admin@esproxy-service:9200
       - GEN3_ARBORIST_ENDPOINT=http://arborist-service
     volumes:
       - ./Secrets/guppy_config.json:/guppy/guppy_config.json
