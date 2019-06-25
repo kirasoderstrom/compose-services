@@ -86,7 +86,8 @@
 
 ## DEPRECATED use base_url
 #c.NotebookApp.base_project_url = '/'
-c.NotebookApp.base_project_url = '/lw-workspace'
+#c.NotebookApp.base_project_url = '/lw-workspace'
+c.NotebookApp.base_project_url = '/jupyter'
 
 ## The base URL for the notebook server.
 #
@@ -202,7 +203,7 @@ c.NotebookApp.base_project_url = '/lw-workspace'
 #c.NotebookApp.iopub_msg_rate_limit = 1000
 
 ## The IP address the notebook server will listen on.
-#c.NotebookApp.ip = 'localhost'
+c.NotebookApp.ip = '0.0.0.0'
 
 ## Supply extra arguments that will be passed to Jinja environment.
 #c.NotebookApp.jinja_environment_options = {}

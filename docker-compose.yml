@@ -44,7 +44,9 @@ services:
     environment:
       - GEN3_DEBUG=True
   fence-service:
-    image: "ohsucompbio/fence:s3-endpoint-jwt"
+    # image: "ohsucompbio/fence:s3-endpoint-jwt"
+    build:
+      context: ../fence
     command: bash /var/www/fence/fence_setup.sh
     container_name: fence-service
     networks:
@@ -167,14 +169,16 @@ services:
       - postgres
       - peregrine-service
       - sheepdog-service
-  # jupyter-service:
-  #   image: "quay.io/occ_data/jupyternotebook:1.7.2"
-  #   #image: jupyter/minimal-notebook
-  #   container_name: jupyter-service
-  #   networks:
-  #     - devnet
-  #   volumes:
-  #     - ./scripts/jupyter_config.py:/home/jovyan/.jupyter/jupyter_notebook_config.py
+  jupyter-service:
+    build:
+      context: jupyternotebook
+    # image: "quay.io/occ_data/jupyternotebook:1.7.2"
+    #image: jupyter/minimal-notebook
+    container_name: jupyter-service
+    networks:
+      - devnet
+    volumes:
+      - ./scripts/jupyter_config.py:/home/jovyan/.jupyter/jupyter_notebook_config.py
   revproxy-service:
     image: "quay.io/cdis/nginx:1.15.5-ctds"
     container_name: revproxy-service
@@ -199,6 +203,7 @@ services:
       - fence-service
       - portal-service
       - pidgin-service
+      - jupyter-service
 
   # replacement for SQS S3 Job Dispatcher https://github.com/uc-cdis/ssjdispatcher
   s3indexer-service:
