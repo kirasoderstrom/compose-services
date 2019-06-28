@@ -14,14 +14,30 @@ namespace: http://gdc.nci.nih.gov
 program: '*'
 project: '*'
 properties:
+  Consent_End_Days:
+    type:
+    - 'null'
+    - string
+  ConsentedDays:
+    type:
+    - 'null'
+    - integer
+  DaysOfDeath:
+    type:
+    - integer
+    - 'null'
+  ParticipantID:
+    type:
+    - 'null'
+    - string
   age:
     type:
     - 'null'
     - integer
-  ca199_min_date:
+  ca199_min_days:
     type:
+    - integer
     - 'null'
-    - string
   cancer_status_at_followup:
     type:
     - 'null'
@@ -30,58 +46,58 @@ properties:
     $ref: _definitions.yaml#/to_one
   created_datetime:
     $ref: _definitions.yaml#/datetime
-  date_of_first_recurrence:
+  days_of_first_recurrence:
     type:
+    - integer
     - 'null'
-    - string
-  dateofdeath:
+  daysofdeath:
     type:
+    - integer
     - 'null'
-    - string
-  death_date:
+  death_days:
     type:
+    - integer
     - 'null'
-    - string
   definitive_grade_at_dx:
     type:
     - 'null'
     - string
-  definitive_resection_date:
+  definitive_resection_days:
     type:
+    - integer
     - 'null'
-    - string
   diagnosis_category:
     type:
     - 'null'
     - string
-  diagnosis_date:
+  diagnosis_days:
     type:
+    - integer
     - 'null'
-    - string
   diagnosis_oncolog:
     type:
     - 'null'
     - string
-  first_course_of_treatment_date:
+  first_course_of_treatment_days:
+    type:
+    - integer
+    - 'null'
+  first_course_radtx_start_days:
+    type:
+    - integer
+    - 'null'
+  fluo_min_days:
     type:
     - 'null'
     - string
-  first_course_radtx_start_date:
+  followup_days:
     type:
+    - integer
     - 'null'
-    - string
-  fluo_min_date:
+  gem_min_days:
     type:
+    - integer
     - 'null'
-    - string
-  followup_date:
-    type:
-    - 'null'
-    - string
-  gem_min_date:
-    type:
-    - 'null'
-    - string
   gender:
     type:
     - 'null'
@@ -89,19 +105,31 @@ properties:
   id:
     $ref: _definitions.yaml#/UUID
     systemAlias: node_id
-  irin_min_date:
+  irin_min_days:
     type:
     - 'null'
     - string
-  leu_min_date:
+  leu_min_days:
     type:
     - 'null'
     - string
-  min_ls_date:
+  lsid:
     type:
     - 'null'
     - string
-  oxal_min_date:
+  min_ls_days:
+    type:
+    - integer
+    - 'null'
+  other_consent:
+    type:
+    - 'null'
+    - string
+  other_consent_details:
+    type:
+    - 'null'
+    - string
+  oxal_min_days:
     type:
     - 'null'
     - string
@@ -109,12 +137,14 @@ properties:
     type:
     - 'null'
     - string
-  pax_min_date:
+  pax_min_days:
+    type:
+    - integer
+    - 'null'
+  project_id:
     type:
     - 'null'
     - string
-  project_id:
-    $ref: _definitions.yaml#/project_id
   site:
     type:
     - 'null'
@@ -129,10 +159,12 @@ properties:
     $ref: _definitions.yaml#/state
   submitter_id:
     type:
-    - string
     - 'null'
+    - string
   type:
-    type: string
+    type:
+    - 'null'
+    - string
   type_of_first_recurrence:
     type:
     - 'null'
@@ -140,6 +172,10 @@ properties:
   updated_datetime:
     $ref: _definitions.yaml#/datetime
   vital_status_at_followup:
+    type:
+    - 'null'
+    - string
+  vitalstatus:
     type:
     - 'null'
     - string

@@ -4,6 +4,7 @@ docker-compose setup */
 CREATE DATABASE metadata_db;
 CREATE DATABASE fence_db;
 CREATE DATABASE indexd_db;
+CREATE DATABASE arborist_db;
 
 CREATE USER fence_user;
 ALTER USER fence_user WITH PASSWORD 'fence_pass';
@@ -24,3 +25,7 @@ ALTER USER indexd_user WITH SUPERUSER;
 CREATE USER etl_user;
 ALTER USER etl_user WITH PASSWORD 'etl_pass';
 ALTER USER etl_user WITH SUPERUSER;
+
+CREATE USER arborist_user;
+ALTER USER arborist_user WITH PASSWORD 'arborist_pass';
+ALTER USER arborist_user WITH SUPERUSER;

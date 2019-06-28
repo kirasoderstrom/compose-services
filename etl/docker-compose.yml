@@ -29,6 +29,8 @@ services:
       memlock:
         soft: -1
         hard: -1
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data      
     # volumes:
       # - ./setup-ssl/root-ca.pem:/usr/share/elasticsearch/config/root-ca.pem
       # - ./setup-ssl/esnode.pem:/usr/share/elasticsearch/config/esnode.pem
@@ -101,26 +103,25 @@ services:
 # openssl s_client -showcerts -connect localhost:9200
 
 
-  etl-service:
-    #image: "ohsucompbio/gen3_replicator:s3-endpoint"
-    build:
-      context: gen3_replicator
-    container_name: etl-service
-    networks:
-      - devnet
-    volumes:
-      - ./Secrets/etl_creds.json:/config/creds.json
-      - ./example-schemas:/schemas_dir
-      - ./setup-ssl:/ca_bundle
-    environment:
-      # DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-      - PATH_TO_SCHEMA_DIR=/schemas_dir
-      - ELASTICSEARCH_URL=https://admin:admin@esproxy-service:9200
-      - REQUESTS_CA_BUNDLE=/ca_bundle/es.cert
-    depends_on:
-      - postgres
-      - esproxy-service
-    restart: always
+#  etl-service:
+#    #image: "ohsucompbio/gen3_replicator:s3-endpoint"
+#    build:
+#      context: ../gen3_replicator
+#    container_name: etl-service
+#    networks:
+#      - devnet
+#    volumes:
+#      - ./Secrets/etl_creds.json:/config/creds.json
+#      - ./example-schemas:/schemas_dir
+#      - ./setup-ssl:/ca_bundle
+#    environment:
+#      # DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+#      - PATH_TO_SCHEMA_DIR=/schemas_dir
+#      - ELASTICSEARCH_URL=https://admin:admin@esproxy-service:9200
+#      - REQUESTS_CA_BUNDLE=/ca_bundle/es.cert
+#    depends_on:
+#      - postgres
+#      - esproxy-service
 
 
   guppy-service:
@@ -139,3 +140,5 @@ services:
 
 networks:
   devnet:
+volumes:
+  esdata01:          
