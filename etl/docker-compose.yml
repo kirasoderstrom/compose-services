@@ -17,12 +17,15 @@ services:
 
   esproxy-service:
     # image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.5.4
-    image: amazon/opendistro-for-elasticsearch:0.9.0
+    image: amazon/opendistro-for-elasticsearch:1.1.0
     container_name: esproxy-service
     environment:
-      - cluster.name=elasticsearch-cluster
+      - cluster.name=elasticsearch
       - bootstrap.memory_lock=false
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - cluster.initial_master_nodes=node-1
+      - discovery.seed_hosts=node-1
+      - node.name=node-1
       # - opendistro_security.disabled=true
       # - opendistro_security.ssl.http.enabled=false
     ulimits:
@@ -30,7 +33,6 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - esdata01:/usr/share/elasticsearch/data      
     # volumes:
       # - ./setup-ssl/root-ca.pem:/usr/share/elasticsearch/config/root-ca.pem
       # - ./setup-ssl/esnode.pem:/usr/share/elasticsearch/config/esnode.pem
@@ -40,7 +42,9 @@ services:
       # - ./setup-ssl/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       # - ./setup-ssl/internal_users.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml
     volumes:
+      - esdata01:/usr/share/elasticsearch/data
       - ./Secrets/elasticsearch-open-distro/config.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/config.yml
+      # - ./Secrets/elasticsearch-open-distro/roles.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/roles.yml
     ports:
       - 9200:9200
       - 9600:9600 # required for Performance Analyzer
@@ -51,6 +55,19 @@ services:
     #   interval: 30s
     #   timeout: 10s
     #   retries: 5
+
+# First time: ...
+# plugins/opendistro_security/tools/securityadmin.sh \
+#  -f plugins/opendistro_security/securityconfig/config.yml \
+#  -icl -nhnv \
+#  -cert config/kirk.pem \
+#  -cacert config/root-ca.pem \
+#  -key config/kirk-key.pem \
+#  -t config
+#
+#
+# https://opendistro.github.io/for-elasticsearch-docs/docs/security-configuration/api/
+
 
 
   # /usr/share/kibana/bin/kibana-plugin install https://github.com/fbaligand/kibana-enhanced-table/releases/download/v1.2.0/enhanced-table-1.2.0_6.7.1.zip
@@ -103,26 +120,25 @@ services:
 # openssl s_client -showcerts -connect localhost:9200
 
 
-#  etl-service:
-#    #image: "ohsucompbio/gen3_replicator:s3-endpoint"
-#    build:
-#      context: ../gen3_replicator
-#    container_name: etl-service
-#    networks:
-#      - devnet
-#    volumes:
-#      - ./Secrets/etl_creds.json:/config/creds.json
-#      - ./example-schemas:/schemas_dir
-#      - ./setup-ssl:/ca_bundle
-#    environment:
-#      # DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-#      - PATH_TO_SCHEMA_DIR=/schemas_dir
-#      - ELASTICSEARCH_URL=https://admin:admin@esproxy-service:9200
-#      - REQUESTS_CA_BUNDLE=/ca_bundle/es.cert
-#    depends_on:
-#      - postgres
-#      - esproxy-service
-
+  etl-service:
+    #image: "ohsucompbio/gen3_replicator:s3-endpoint"
+    build:
+      context: ../gen3_replicator
+    container_name: etl-service
+    networks:
+      - devnet
+    volumes:
+      - ./Secrets/etl_creds.json:/config/creds.json
+      - ./example-schemas:/schemas_dir
+      - ./setup-ssl:/ca_bundle
+    environment:
+      # DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+      - PATH_TO_SCHEMA_DIR=/schemas_dir
+      - ELASTICSEARCH_URL=https://admin:admin@esproxy-service:9200
+      - REQUESTS_CA_BUNDLE=/ca_bundle/es.cert
+    depends_on:
+      - postgres
+      - esproxy-service
 
   guppy-service:
     image: "quay.io/cdis/guppy"
@@ -131,6 +147,7 @@ services:
       - devnet
     depends_on:
       - esproxy-service
+      - arborist-service
     environment:
       - GUPPY_CONFIG_FILEPATH=/guppy/guppy_config.json
       - GEN3_ES_ENDPOINT=https://admin:admin@esproxy-service:9200
@@ -138,7 +155,12 @@ services:
     volumes:
       - ./Secrets/guppy_config.json:/guppy/guppy_config.json
 
+  revproxy-service:
+    depends_on:
+      - guppy-service
+
+
 networks:
   devnet:
 volumes:
-  esdata01:          
+  esdata01:

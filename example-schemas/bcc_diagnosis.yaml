@@ -26,10 +26,10 @@ properties:
     type:
     - 'null'
     - string
-  diagnosis_date:
+  diagnosis_days:
     type:
     - 'null'
-    - string
+    - integer
   diagnosis_name:
     type:
     - string

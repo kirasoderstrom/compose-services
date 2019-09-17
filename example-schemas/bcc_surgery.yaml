@@ -16,14 +16,14 @@ project: '*'
 properties:
   created_datetime:
     $ref: _definitions.yaml#/datetime
-  date:
+  days:
     type:
     - 'null'
-    - string
-  definitive_resection_date:
+    - integer
+  definitive_resection_days:
     type:
     - 'null'
-    - string
+    - integer
   id:
     $ref: _definitions.yaml#/UUID
     systemAlias: node_id
@@ -32,7 +32,9 @@ properties:
     - 'null'
     - string
   project_id:
-    $ref: _definitions.yaml#/project_id
+    type:
+    - 'null'
+    - string
   regional_nodes_examined:
     type:
     - integer
@@ -41,12 +43,16 @@ properties:
     type:
     - integer
     - 'null'
+  source:
+    type:
+    - 'null'
+    - string
   state:
     $ref: _definitions.yaml#/state
   submitter_id:
     type:
-    - string
     - 'null'
+    - string
   surgical_margins:
     type:
     - 'null'

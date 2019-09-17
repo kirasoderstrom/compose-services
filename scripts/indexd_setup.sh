@@ -1,5 +1,5 @@
 #!/bin/bash
-# entrypoint bash script for indexd to healthcheck postgres to make sure that 
+# entrypoint bash script for indexd to healthcheck postgres to make sure that
 # postgres is ready before indexd tries to access its database
 
 sleep 2
@@ -11,4 +11,4 @@ done
 echo "postgres is ready"
 
 python /indexd/bin/index_admin.py create --username indexd_client --password indexd_client_pass
-rm -f /var/run/apache2/apache2.pid && /indexd/dockerrun.bash
+/dockerrun.sh

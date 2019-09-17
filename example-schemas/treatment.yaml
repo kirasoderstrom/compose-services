@@ -27,7 +27,14 @@ links:
     label: describes #need better term here
     target_type: diagnosis
     multiplicity: many_to_one
-    required: true
+    required: false
+  - name: case
+    backref: treatments
+    label: describes #need better term here
+    target_type: case
+    multiplicity: many_to_one
+    required: false
+
 
 
 
