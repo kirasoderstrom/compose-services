@@ -498,6 +498,28 @@ properties:
   sample_type:
     description: "Characterization of the sample as either clinical or contrived."
     enum:
+      - Autopsy
+      - Buccal Swab
+      - Buffy Coat
+      - Consult
+      - Cytology
+      - DNA
+      - Fine Needle Aspiration
+      - Frozen Tissue
+      - HE Slide - Paraffin
+      - OCT
+      - Pancreatic Fluid
+      - Paraffin Block
+      - Paxgene RNA additive blood
+      - Plasma
+      - Plasma Cell Free
+      - Primary Tumor
+      - Serum
+      - Surgical
+      - Surgical Pathology
+      - Unprocessed Blood
+      - Unprocessed Tissue
+      - White Blood Cells            
       - Additional Metastatic
       - Additional - New Primary
       - Blood Derived Cancer - Bone Marrow, Post-treatment
@@ -674,6 +696,16 @@ properties:
       - Not Reported
       - Not Allowed To Collect
     description: "A description of the tumor from which the sample was derived." # TOREVIEW
+
+  days_to_birth:
+    term:
+      $ref: "_terms.yaml#/days_to_birth"
+    type:
+      - number
+      - "null"
+    maximum: 0
+    minimum: -43800
+
   cases:
     $ref: "_definitions.yaml#/to_one"
   diagnoses:
