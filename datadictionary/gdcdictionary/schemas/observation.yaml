@@ -83,6 +83,20 @@ properties:
       - number
       - "null"
 
+  measurement2:
+    description: >
+      Numeric measurement.
+    type:
+      - number
+      - "null"
+
+  measurement3:
+    description: >
+      Numeric measurement.
+    type:
+      - number
+      - "null"
+
   description:
     description: >
       Text observation.
