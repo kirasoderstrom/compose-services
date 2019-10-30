@@ -288,7 +288,7 @@ biomarker_name:
     term: Biomarker Name
     source: caDSR
     cde_id: 5473
-    cde_version: 11.0 
+    cde_version: 11.0
     term_url: "https://cdebrowser.nci.nih.gov/CDEBrowser/search?elementDetails=9&FirstTimer=0&PageId=ElementDetailsGroup&publicId=5473&version=2.31"
 
 biomarker_result:
@@ -470,7 +470,7 @@ datetime:
 
 days_to_birth:
   description: >
-    Time interval from a person's date of birth to the date of initial pathologic diagnosis,
+    Time interval from a person's date of birth to the date of initial pathologic diagnosis (or other event),
     represented as a calculated negative number of days.
   termDef:
     term: Person Birth Date Less Initial Pathologic Diagnosis Date Calculated Day Value
@@ -618,7 +618,7 @@ dlco_ref_predictive_percent:
     cde_version: 1.0
     term_url: "https://cdebrowser.nci.nih.gov/CDEBrowser/search?elementDetails=9&FirstTimer=0&PageId=ElementDetailsGroup&publicId=2180255&version=1.0"
 
-encoding: 
+encoding:
   description: >
     Version of ASCII encoding of quality values found in the file.
   termDef:

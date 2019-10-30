@@ -31,8 +31,13 @@ links:
     label: describes #need better term here
     target_type: diagnosis
     multiplicity: many_to_one
-    required: true
-
+    required: false
+  - name: cases
+    backref: treatments
+    label: describes #need better term here
+    target_type: case
+    multiplicity: many_to_one
+    required: false
 
 
 uniqueKeys:
@@ -204,7 +209,19 @@ properties:
       - Not Reported
       - Not Allowed To Collect
 
+  days_to_birth:
+    term:
+      $ref: "_terms.yaml#/days_to_birth"
+    type:
+      - number
+      - "null"
+    maximum: 0
+    minimum: -43800
+
   diagnoses:
+    $ref: "_definitions.yaml#/to_one"
+
+  cases:
     $ref: "_definitions.yaml#/to_one"
 
   project_id:
