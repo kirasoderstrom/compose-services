@@ -96,3 +96,22 @@ You may wish to shorthand this as:
 ```
 alias dc='docker-compose -f docker-compose.yml -f onprem/docker-compose.yml'
 ```
+
+Other useful shorthands:
+
+```
+# rebuild container
+rs() {
+  dc stop $1-service; dc rm -f $1-service; dc build $1-service; dc up -d $1-service;
+}
+
+# log container
+log() {
+  dc logs -f $1-service
+}
+
+# exec in container
+ex() {
+  dc exec $1-service bash
+}
+```

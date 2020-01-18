@@ -60,6 +60,11 @@ properties:
       Observations are polymorphic, this type identifies specific observation.
     type: string
 
+  observation_key:
+    description: >
+      There can be multiple instances of an observation_type, this key identifies instance.
+    type: string
+
   days_to_birth:
     term:
       $ref: "_terms.yaml#/days_to_birth"
