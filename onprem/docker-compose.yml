@@ -1,9 +1,19 @@
-version: '3'
-services:
+version: '3.4'
 
-  # over ride fence to use our fork which supports non aws url signing
-  fence-service:
-    image: "onprem/fence"
+# use yaml's 'anchor' to define logging
+# x-docker-data is an extension and when docker-compose
+# parses the YAML, it will not do anything with it
+
+x-docker-data: &logging
+  logging:
+    driver: gelf
+    options:
+      # Use udp://host.docker.internal:12201 when you are using Docker Desktop for Mac
+      # docs: https://docs.docker.com/docker-for-mac/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host
+      # issue: https://github.com/lvthillo/docker-elk/issues/1
+      gelf-address: "udp://localhost:12201"
+
+services:
 
   # replacement for SQS S3 Job Dispatcher https://github.com/uc-cdis/ssjdispatcher
   s3indexer-service:
@@ -17,3 +27,136 @@ services:
       - devnet
     depends_on:
       - indexd-service
+    <<: *logging  # include logging
+
+  # replacement for hatchery Job Dispatcher https://github.com/uc-cdis/hatchery
+  hatchery-service:
+    image: "onprem/hatchery"
+    container_name: hatchery-service
+    volumes:
+      - ./onprem/hatchery-local:/app
+    networks:
+      - devnet
+    # <<: *logging  # include logging
+
+  # jwt simplifier /gen3-authz
+  voucher-service:
+    build:
+        context: onprem/voucher
+    container_name: voucher-service
+    networks:
+      - devnet
+    environment:
+      - JWT_PRIVATE_KEY_PATH=/fence/keys/2019-09-18T19:08:35Z/jwt_private_key.pem
+      - JWT_PUBLIC_KEY_PATH=/fence/keys/2019-09-18T19:08:35Z/jwt_public_key.pem
+    volumes:
+      - ./onprem/voucher:/app
+      - ./Secrets/fenceJwtKeys:/fence/keys
+    ports:
+      - 5000:5000
+    depends_on:
+      - fence-service
+    networks:
+      - devnet
+    # <<: *logging  # include logging
+
+  # see https://itnext.io/deploy-elk-stack-in-docker-to-monitor-containers-c647d7e2bfcd
+  logstash-service:
+    #image: docker.elastic.co/logstash/logstash-oss:6.8.1
+    image: onprem/logstash
+    container_name: logstash-service
+    depends_on:
+      - esproxy-service
+    ports:
+      - 12201:12201/udp
+    volumes:
+      - ./Secrets/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    networks:
+      - devnet
+
+  # sqlite
+  wiki-service:
+    # image: "phreakazoid/mediawiki"  # "kristophjunge/mediawiki"
+    build:
+      context: onprem/mediawiki
+    container_name: wiki-service
+    # ports:
+    #   - "8080:8080"
+    environment:
+      - MEDIAWIKI_SERVER=https://gen3.compbio.ohsu.edu
+      - MEDIAWIKI_SITENAME=HOPWiki
+      - MEDIAWIKI_LANGUAGE_CODE=en
+      - MEDIAWIKI_DB_TYPE=sqlite
+      - MEDIAWIKI_DB_NAME=wikidb
+      - MEDIAWIKI_ENABLE_UPLOADS=1
+      - MEDIAWIKI_EXTENSION_VISUAL_EDITOR_ENABLED=0
+      - MEDIAWIKI_DEFAULT_SKIN=vector
+      - MEDIAWIKI_DEBUG=1
+      - MEDIAWIKI_DB_PATH=/data
+      - MEDIAWIKI_SECRET_KEY=01777164da1d2797d9af0006e4dacbcd0944cae1647e8678f16f01ee2e77c28b
+    volumes:
+      - ./onprem/wiki/mediawiki/images:/images
+      - ./onprem/wiki/mediawiki/data:/data
+      - ./onprem/wiki/mediawiki/resources/assets/healthy-oregon-for-the-web.jpg:/var/www/mediawiki/hop-wiki/resources/assets/healthy-oregon-for-the-web.jpg
+      - ./onprem/wiki/mediawiki/LocalSettings.php:/var/www/mediawiki/hop-wiki/LocalSettings.php:ro
+      - ./onprem/wiki/mediawiki/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./onprem/wiki/mediawiki/extensions/Auth_remoteuser:/var/www/mediawiki/hop-wiki/extensions/Auth_remoteuser:ro
+      # - ./onprem/wiki/mediawiki/log:/var/log/mediawiki  # for debug log
+      # - ./onprem/wiki/mediawiki/fastcgi_params:/etc/nginx/fastcgi_params:ro
+    networks:
+      - devnet
+
+# dc exec  wiki-service /script/install.sh admin password
+# -v ./var/mediawiki/extensions/MyOtherExtension:/var/www/mediawiki/extensions/MyOtherExtension:ro
+# wget https://extdist.wmflabs.org/dist/extensions/Auth_remoteuser-REL1_34-4079f81.tar.gz
+# tar -xzf  Auth_remoteuser-REL1_34-4079f81.tar.gz -C .
+# rm Auth_remoteuser-REL1_34-4079f81.tar.gz
+
+
+
+  tmp-service:
+    image: rocker/shiny
+    container_name: tmp-service
+    volumes:
+      - ./onprem/shiny-server/shiny-server.conf:/etc/shiny-server/shiny-server.conf
+    networks:
+      - devnet
+
+
+  # ---------
+  # overrides
+  # ---------
+  # over ride fence to use our fork which supports non aws url signing
+  fence-service:
+    image: "onprem/fence"
+    # <<: *logging  # include logging
+
+  # include logging
+  arborist-service:
+    <<: *logging
+  # composeservices_postgres_1:
+  #   <<: *logging
+  # esproxy-service:
+  #   <<: *logging
+  guppy-service:
+    <<: *logging
+  indexd-service:
+    <<: *logging
+  jupyter-service:
+    <<: *logging
+  kibana-service:
+    <<: *logging
+  peregrine-service:
+    <<: *logging
+  pidgin-service:
+    <<: *logging
+  # portal-service:
+  #   <<: *logging
+  # revproxy-service:
+  #   <<: *logging
+  sheepdog-service:
+    <<: *logging
+  spark-service:
+    <<: *logging
+  tube-service:
+    <<: *logging
