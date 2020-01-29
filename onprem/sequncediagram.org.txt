@@ -1,0 +1,55 @@
+title gen3:On Premises
+participant external_client
+gen3-client->fence:$ gen3-client upload file_name
+fence-->gen3-client: signed url [bucket,did,file_name]
+fence-->indexd: 'blank' partial indexd record
+gen3-client->bucket: post data
+bucket-->gen3-client: OK
+loop poll managed bucket 
+activate s3indexer
+s3indexer->fence: fetch_all
+fence-->s3indexer: blank records
+s3indexer->s3indexer: indexs3client
+activate s3indexer
+s3indexer->bucket: get object
+bucket-->s3indexer: data
+s3indexer->s3indexer: calculate_hashes
+s3indexer->indexd: update record size, hashes
+note over indexd:file index complete
+deactivate s3indexer
+deactivate s3indexer
+end
+
+opt external bucket poller
+external_client->bucket:upload file_name
+activate bucket
+bucket->bucket: save file
+deactivateafter bucket
+
+activate s3indexer
+s3indexer->bucket: list_objects
+s3indexer->s3indexer:already processed? skip
+s3indexer->fence:create blank_record
+s3indexer->s3indexer:calculate_hashes
+s3indexer->indexd: update record size, hashes
+note over indexd:file index complete
+deactivate s3indexer
+end
+
+==roadmap: support on-premises bucket notifications==
+
+opt #lightblue external bucket notifier 
+
+external_client->bucket:upload file_name
+activate bucket
+bucket->bucket: save file
+bucket-->s3indexer:pub_sub notification
+deactivate bucket
+activate s3indexer
+s3indexer->fence:create blank_record
+s3indexer->s3indexer:calculate_hashes
+s3indexer->indexd: update record size, hashes
+note over indexd:file index complete
+deactivate s3indexer
+end
+

@@ -1,7 +1,8 @@
-version: '3'
+version: '3.4'
 services:
   postgres:
     image: postgres:9.6
+    # container_name: postgres-service
     networks:
       - devnet
     volumes:
@@ -183,7 +184,7 @@ services:
     depends_on:
       - peregrine-service
   portal-service:
-    image: "quay.io/cdis/data-portal:master"
+    image: "onprem/data-portal"
     container_name: portal-service
     command: ["bash", "/var/www/data-portal/waitForContainers.sh"]
     networks:
@@ -198,7 +199,9 @@ services:
       #- MOCK_STORE=true
       - APP=gitops
       - GDC_SUBPATH=http://revproxy-service/api/v0/submission/
-
+      - WORKSPACE_URL=https://gen3.compbio.ohsu.edu/lw-workspace
+      # CSP allow links to all from additional url
+      # - WIKI_URL=*
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost"]
       interval: 60s
@@ -269,23 +272,8 @@ services:
       - devnet
     depends_on:
       - esproxy-service
-  voucher-service:
-    build: voucher
-    container_name: voucher-service
-    networks:
-      - devnet
-    environment:
-      - JWT_PRIVATE_KEY_PATH=/fence/keys/2019-09-18T19:08:35Z/jwt_private_key.pem
-      - JWT_PUBLIC_KEY_PATH=/fence/keys/2019-09-18T19:08:35Z/jwt_public_key.pem
-    volumes:
-      - ./voucher:/app
-      - ./Secrets/fenceJwtKeys:/fence/keys
-    ports:
-      - 5000:5000
-    depends_on:
-      - fence-service
   revproxy-service:
-    image: "quay.io/cdis/nginx:1.15.5-ctds"
+    image: nginx:1.17.8 # "quay.io/cdis/nginx:1.15.5-ctds"
     container_name: revproxy-service
     networks:
       - devnet
@@ -309,6 +297,7 @@ services:
       - portal-service
       - pidgin-service
       - voucher-service
+      - wiki-service
 networks:
   devnet:
 volumes:
