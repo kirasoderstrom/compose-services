@@ -2,6 +2,7 @@ fence/
 gen3-s3indexer/
 indexs3client/
 hatchery-local/
+hatchery-lite/
 data-portal/
 tube/
 mediawiki/

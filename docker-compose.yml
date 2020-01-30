@@ -297,7 +297,6 @@ services:
       - portal-service
       - pidgin-service
       - voucher-service
-      - wiki-service
 networks:
   devnet:
 volumes:
