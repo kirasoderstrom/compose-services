@@ -253,8 +253,11 @@ $wgGroupPermissions['*']['createaccount'] = false;
 $wgGroupPermissions['*']['autocreateaccount'] = true;
 
 $wgAuthRemoteuserUserNameReplaceFilter = [
-    '@'                   => '_at_'       // replace underscores with spaces
+    '@.*$'                   => ''       // strip email suffix
 ];
 
 # allow all frame
 $wgEditPageFrameOptions=false;
+
+// to assign user to admin groups
+// php createAndPromote.php --bureaucrat --sysop --interface-admin    --force TitleCaseUserNameHere
