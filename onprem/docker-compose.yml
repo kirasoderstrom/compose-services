@@ -6,12 +6,20 @@ version: '3.4'
 
 x-docker-data: &logging
   logging:
-    driver: gelf
     options:
-      # Use udp://host.docker.internal:12201 when you are using Docker Desktop for Mac
-      # docs: https://docs.docker.com/docker-for-mac/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host
-      # issue: https://github.com/lvthillo/docker-elk/issues/1
-      gelf-address: "udp://localhost:12201"
+      max-size: 10m
+      max-file: "5"
+
+  # logging:
+  #   driver: gelf
+  #   options:
+  #     # Use udp://host.docker.internal:12201 when you are using Docker Desktop for Mac
+  #     # docs: https://docs.docker.com/docker-for-mac/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host
+  #     # issue: https://github.com/lvthillo/docker-elk/issues/1
+  #     gelf-address: "udp://localhost:12201"
+
+
+
 
 services:
 
@@ -34,7 +42,7 @@ services:
     image: "onprem/hatchery"
     container_name: hatchery-service
     volumes:
-      - ./onprem/hatchery-local:/app
+      - ./onprem/hatchery-lite:/app
     networks:
       - devnet
     # <<: *logging  # include logging
@@ -47,8 +55,8 @@ services:
     networks:
       - devnet
     environment:
-      - JWT_PRIVATE_KEY_PATH=/fence/keys/2019-09-18T19:08:35Z/jwt_private_key.pem
-      - JWT_PUBLIC_KEY_PATH=/fence/keys/2019-09-18T19:08:35Z/jwt_public_key.pem
+      - JWT_PRIVATE_KEY_PATH=/fence/keys/2020-01-31T23:24:26Z/jwt_private_key.pem
+      - JWT_PUBLIC_KEY_PATH=/fence/keys/2020-01-31T23:24:26Z/jwt_public_key.pem
     volumes:
       - ./onprem/voucher:/app
       - ./Secrets/fenceJwtKeys:/fence/keys
@@ -89,8 +97,8 @@ services:
   # overrides
   # ---------
   # over ride fence to use our fork which supports non aws url signing
-  # fence-service:
-  #   image: "onprem/fence"
+  fence-service:
+    image: "onprem/fence"
   #   # <<: *logging  # include logging
 
   # # include logging
@@ -98,15 +106,17 @@ services:
   #   <<: *logging
   # # composeservices_postgres_1:
   # #   <<: *logging
-  # # esproxy-service:
-  # #   <<: *logging
+
+  esproxy-service:
+    <<: *logging
+  kibana-service:
+    <<: *logging
+
   # guppy-service:
   #   <<: *logging
   # indexd-service:
   #   <<: *logging
   # jupyter-service:
-  #   <<: *logging
-  # kibana-service:
   #   <<: *logging
   # peregrine-service:
   #   <<: *logging
