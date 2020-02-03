@@ -54,12 +54,15 @@ services:
     container_name: voucher-service
     networks:
       - devnet
-    environment:
-      - JWT_PRIVATE_KEY_PATH=/fence/keys/2020-01-31T23:24:26Z/jwt_private_key.pem
-      - JWT_PUBLIC_KEY_PATH=/fence/keys/2020-01-31T23:24:26Z/jwt_public_key.pem
     volumes:
       - ./onprem/voucher:/app
-      - ./Secrets/fenceJwtKeys:/fence/keys
+      # use long form due to colon in source
+      - type: bind
+        source: ./Secrets/fenceJwtKeys/2020-01-31T23:24:26Z/jwt_private_key.pem
+        target: /fence/keys/jwt_private_key.pem
+      - type: bind
+        source: ./Secrets/fenceJwtKeys/2020-01-31T23:24:26Z/jwt_public_key.pem
+        target: /fence/keys/jwt_public_key.pem
     ports:
       - 5000:5000
     depends_on:
