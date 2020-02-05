@@ -20,11 +20,11 @@ services:
   postgres:
     image: postgres:9.6
     # container_name: postgres-service
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
       - "psqldata:/var/lib/postgresql/data"
-      - "./scripts/postgres_init.sql:/docker-entrypoint-initdb.d/postgres_init.sql"
+      - "./compose-services/scripts/postgres_init.sql:/docker-entrypoint-initdb.d/postgres_init.sql"
     restart: unless-stopped
     healthcheck:
         test: ["CMD-SHELL", "psql -U fence_user -d fence_db -c 'SELECT 1;'"]
@@ -36,17 +36,18 @@ services:
     #    psql -h localhost -d fence -U fence_user
     #ports:
     #  - 5432:5432
+
   indexd-service:
     image: "quay.io/cdis/indexd:master"
     command: bash indexd_setup.sh
     container_name: indexd-service
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
-      - ./Secrets/indexd_settings.py:/var/www/indexd/local_settings.py
-      - ./Secrets/indexd_creds.json:/var/www/indexd/creds.json
-      - ./Secrets/config_helper.py:/var/www/indexd/config_helper.py
-      - ./scripts/indexd_setup.sh:/var/www/indexd/indexd_setup.sh
+      - ./compose-services/Secrets/indexd_settings.py:/var/www/indexd/local_settings.py
+      - ./compose-services/Secrets/indexd_creds.json:/var/www/indexd/creds.json
+      - ./compose-services/Secrets/config_helper.py:/var/www/indexd/config_helper.py
+      - ./compose-services/scripts/indexd_setup.sh:/var/www/indexd/indexd_setup.sh
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/_status"]
       interval: 60s
@@ -54,18 +55,19 @@ services:
       retries: 3
     depends_on:
       - postgres
+
   fence-service:
     image: "quay.io/cdis/fence:master"
     command: bash /var/www/fence/fence_setup.sh
     container_name: fence-service
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
-      - ./Secrets/fence-config.yaml:/var/www/fence/fence-config.yaml
-      - ./Secrets/user.yaml:/var/www/fence/user.yaml
-      - ./Secrets/TLS/service.crt:/usr/local/share/ca-certificates/cdis-ca.crt
-      - ./Secrets/fenceJwtKeys:/fence/keys
-      - ./scripts/fence_setup.sh:/var/www/fence/fence_setup.sh
+      - ./compose-services/Secrets/fence-config.yaml:/var/www/fence/fence-config.yaml
+      - ./compose-services/Secrets/user.yaml:/var/www/fence/user.yaml
+      - ./compose-services/Secrets/TLS/service.crt:/usr/local/share/ca-certificates/cdis-ca.crt
+      - ./compose-services/Secrets/fenceJwtKeys:/fence/keys
+      - ./compose-services/scripts/fence_setup.sh:/var/www/fence/fence_setup.sh
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/_status"]
       interval: 60s
@@ -75,14 +77,15 @@ services:
       - PYTHONPATH=/var/www/fence
     depends_on:
       - postgres
+
   arborist-service:
     image: "quay.io/cdis/arborist:master"
     container_name: arborist-service
     entrypoint: bash /go/src/github.com/uc-cdis/arborist/arborist_setup.sh
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
-      - ./scripts/arborist_setup.sh:/go/src/github.com/uc-cdis/arborist/arborist_setup.sh
+      - ./compose-services/scripts/arborist_setup.sh:/go/src/github.com/uc-cdis/arborist/arborist_setup.sh
     environment:
       - JWKS_ENDPOINT=http://fence-service/.well-known/jwks
       - PGDATABASE=arborist_db
@@ -98,18 +101,19 @@ services:
       retries: 10
     depends_on:
       - postgres
+
   peregrine-service:
     image: "quay.io/cdis/peregrine:master"
     container_name: peregrine-service
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
-      - ./Secrets/peregrine_settings.py:/var/www/peregrine/wsgi.py
-      - ./Secrets/peregrine_creds.json:/var/www/peregrine/creds.json
-      - ./Secrets/config_helper.py:/var/www/peregrine/config_helper.py
-      - ./Secrets/TLS/service.crt:/usr/local/share/ca-certificates/cdis-ca.crt
-      - ./scripts/peregrine_setup.sh:/peregrine_setup.sh
-      # - ./datadictionary/gdcdictionary/schemas:/schemas_dir
+      - ./compose-services/Secrets/peregrine_settings.py:/var/www/peregrine/wsgi.py
+      - ./compose-services/Secrets/peregrine_creds.json:/var/www/peregrine/creds.json
+      - ./compose-services/Secrets/config_helper.py:/var/www/peregrine/config_helper.py
+      - ./compose-services/Secrets/TLS/service.crt:/usr/local/share/ca-certificates/cdis-ca.crt
+      - ./compose-services/scripts/peregrine_setup.sh:/peregrine_setup.sh
+      # - ./compose-services/datadictionary/gdcdictionary/schemas:/schemas_dir
     environment: &env
       DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
       # PATH_TO_SCHEMA_DIR: /schemas_dir
@@ -123,25 +127,25 @@ services:
     depends_on:
       - postgres
       - sheepdog-service
+
   sheepdog-service:
     image: "quay.io/cdis/sheepdog:master"
     command: bash /sheepdog_setup.sh
     container_name: sheepdog-service
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
-      - ./Secrets/sheepdog_settings.py:/var/www/sheepdog/wsgi.py
-      - ./Secrets/sheepdog_creds.json:/var/www/sheepdog/creds.json
-      - ./Secrets/config_helper.py:/var/www/sheepdog/config_helper.py
-      - ./scripts/sheepdog_setup.sh:/sheepdog_setup.sh
-      - ./datadictionary/gdcdictionary/schemas:/schemas_dir
+      - ./compose-services/Secrets/sheepdog_settings.py:/var/www/sheepdog/wsgi.py
+      - ./compose-services/Secrets/sheepdog_creds.json:/var/www/sheepdog/creds.json
+      - ./compose-services/Secrets/config_helper.py:/var/www/sheepdog/config_helper.py
+      - ./compose-services/scripts/sheepdog_setup.sh:/sheepdog_setup.sh
+      - ./compose-services/datadictionary/gdcdictionary/schemas:/schemas_dir
     environment:  # *env
       GEN3_DEBUG: "True"
       # duplicate here for debugging *env
       DICTIONARY_URL: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
       # PATH_TO_SCHEMA_DIR: /schemas_dir
       REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
-
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/_status"]
       interval: 60s
@@ -149,14 +153,15 @@ services:
       retries: 5
     depends_on:
       - postgres
+
   guppy-service:
     image: "quay.io/cdis/guppy:master"
     container_name: guppy-service
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
-      - ./Secrets/guppy_config.json:/guppy/guppy_config.json
-      - ./scripts/guppy_start.sh:/guppy/guppy_start.sh
+      - ./compose-services/Secrets/guppy_config.json:/guppy/guppy_config.json
+      - ./compose-services/scripts/guppy_start.sh:/guppy/guppy_start.sh
     environment:
       - GUPPY_CONFIG_FILEPATH=/guppy/guppy_config.json
       - GEN3_ARBORIST_ENDPOINT=http://arborist-service
@@ -176,8 +181,8 @@ services:
     container_name: esproxy-service
     volumes:
       - esdata01:/usr/share/elasticsearch/data
-      - ./Secrets/elasticsearch-open-distro/config.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/config.yml
-      - ./Secrets/elasticsearch-open-distro/roles.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/roles.yml
+      - ./compose-services/Secrets/elasticsearch-open-distro/config.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/config.yml
+      - ./compose-services/Secrets/elasticsearch-open-distro/roles.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/roles.yml
     environment:
       - cluster.name=elasticsearch-cluster
       - bootstrap.memory_lock=false
@@ -194,15 +199,33 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
+
+  kibana-service:
+    build:
+      context: compose-services/kibana
+    container_name: kibana-service
+    environment:
+      - SERVER_NAME=kibana-service
+      - ELASTICSEARCH_URL=http://admin:admin@esproxy-service:9200
+      - SERVER_BASEPATH=/kibana
+    volumes:
+      - ./compose-services/Secrets/elasticsearch-open-distro/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 5601:5601
+    # networks:
+    #   - devnet
+    depends_on:
+      - esproxy-service
+
   pidgin-service:
     image: "quay.io/cdis/pidgin:master"
     container_name: pidgin-service
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
-      - ./scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
+      - ./compose-services/scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/_status"]
       interval: 60s
@@ -210,17 +233,18 @@ services:
       retries: 3
     depends_on:
       - peregrine-service
+
   portal-service:
     image: "onprem/data-portal"
     container_name: portal-service
     command: ["bash", "/var/www/data-portal/waitForContainers.sh"]
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
-      - ./scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
-      - ./Secrets/gitops.json:/data-portal/data/config/gitops.json
-      - ./Secrets/gitops-logo.png:/data-portal/custom/logo/gitops-logo.png
-      - ./Secrets/gitops.png:/data-portal/custom/createdby/gitops.png
+      - ./compose-services/scripts/waitForContainers.sh:/var/www/data-portal/waitForContainers.sh
+      - ./compose-services/Secrets/gitops.json:/data-portal/data/config/gitops.json
+      - ./compose-services/Secrets/gitops-logo.png:/data-portal/custom/logo/gitops-logo.png
+      - ./compose-services/Secrets/gitops.png:/data-portal/custom/createdby/gitops.png
     environment:
       - NODE_ENV=dev
       #- MOCK_STORE=true
@@ -238,117 +262,105 @@ services:
       - postgres
       - peregrine-service
       - sheepdog-service
-  jupyter-service:
-    image: "quay.io/occ_data/jupyternotebook:1.7.2"
-    #image: jupyter/minimal-notebook
-    container_name: jupyter-service
-    networks:
-      - devnet
-    volumes:
-      - ./scripts/jupyter_config.py:/home/jovyan/.jupyter/jupyter_notebook_config.py
-  tube-service:
-    # image: "quay.io/cdis/tube:master"
-    build:
-      context: onprem/tube
-    container_name: tube-service
-    command: bash -c "while true; do sleep 5; done"
-    networks:
-      - devnet
-    environment:
-      - DICTIONARY_URL=https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-      - ES_URL=http://admin:admin@esproxy-service:9200
-      - ES_INDEX_NAME=etl
-      - HADOOP_URL=hdfs://spark-service:9000
-      - HADOOP_HOST=spark-service
-    volumes:
-      - ./Secrets/etl_creds.json:/usr/share/gen3/tube/creds.json
-      - ./Secrets/etlMapping.yaml:/usr/share/gen3/tube/etlMapping.yaml
-      - ./Secrets/user.yaml:/usr/share/gen3/tube/user.yaml
-    depends_on:
-      - postgres
-      - esproxy-service
-      - spark-service
-  spark-service:
-    image: "quay.io/cdis/gen3-spark:master"
-    container_name: spark-service
-    command: bash -c "python run_config.py && hdfs namenode -format && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"
-    expose:
-      - 22
-      - 8030
-      - 8031
-      - 8032
-      - 9000
-    networks:
-      - devnet
-    environment:
-      - HADOOP_URL=hdfs://0.0.0.0:9000
-      - HADOOP_HOST=0.0.0.0
-  kibana-service:
-    build:
-      context: kibana
-    container_name: kibana-service
-    environment:
-      - SERVER_NAME=kibana-service
-      - ELASTICSEARCH_URL=http://admin:admin@esproxy-service:9200
-      - SERVER_BASEPATH=/kibana
-    volumes:
-      - ./Secrets/elasticsearch-open-distro/kibana.yml:/usr/share/kibana/config/kibana.yml
-    ports:
-      - 5601:5601
-    networks:
-      - devnet
-    depends_on:
-      - esproxy-service
-  revproxy-service:
-    image: nginx:1.17.8
-    container_name: revproxy-service
-    networks:
-      - devnet
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx-options:/etc/nginx/nginx-options
-      - ./nginx-locations:/etc/nginx/nginx-locations
 
-      # manual (!letsencrypt)
-      # - ./Secrets/TLS/service.crt:/etc/nginx/ssl/nginx.crt
-      # - ./Secrets/TLS/service.key:/etc/nginx/ssl/nginx.key
+  # jupyter-service:
+  #   image: "quay.io/occ_data/jupyternotebook:1.7.2"
+  #   #image: jupyter/minimal-notebook
+  #   container_name: jupyter-service
+  #   # networks:
+  #   #   - devnet
+  #   volumes:
+  #     - ./compose-services/scripts/jupyter_config.py:/home/jovyan/.jupyter/jupyter_notebook_config.py
 
-      # for letsencrypt
-      - ./onprem/certbot/conf:/etc/letsencrypt
-      - ./onprem/certbot/www:/var/www/certbot
-      - ./scripts/revproxy_start.sh:/etc/nginx/run.sh
-    ports:
-      - "80:80"
-      - "443:443"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost"]
-      interval: 60s
-      timeout: 5s
-      retries: 3
-    depends_on:
-      - indexd-service
-      - peregrine-service
-      - sheepdog-service
-      - fence-service
-      - portal-service
-      - pidgin-service
-      - voucher-service
-    # command: bash revproxy_start.sh
+  # tube-service:
+  #   # image: "quay.io/cdis/tube:master"
+  #   build:
+  #     context: onprem/tube
+  #   container_name: tube-service
+  #   command: bash -c "while true; do sleep 5; done"
+  #   # networks:
+  #   #   - devnet
+  #   environment:
+  #     - DICTIONARY_URL=https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+  #     - ES_URL=http://admin:admin@esproxy-service:9200
+  #     - ES_INDEX_NAME=etl
+  #     - HADOOP_URL=hdfs://spark-service:9000
+  #     - HADOOP_HOST=spark-service
+  #   volumes:
+  #     - ./compose-services/Secrets/etl_creds.json:/usr/share/gen3/tube/creds.json
+  #     - ./compose-services/Secrets/etlMapping.yaml:/usr/share/gen3/tube/etlMapping.yaml
+  #     - ./compose-services/Secrets/user.yaml:/usr/share/gen3/tube/user.yaml
+  #   depends_on:
+  #     - postgres
+  #     - esproxy-service
+  #     - spark-service
+
+  # spark-service:
+  #   image: "quay.io/cdis/gen3-spark:master"
+  #   container_name: spark-service
+  #   command: bash -c "python run_config.py && hdfs namenode -format && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"
+  #   expose:
+  #     - 22
+  #     - 8030
+  #     - 8031
+  #     - 8032
+  #     - 9000
+  #   # networks:
+  #   #   - devnet
+  #   environment:
+  #     - HADOOP_URL=hdfs://0.0.0.0:9000
+  #     - HADOOP_HOST=0.0.0.0
+
+  # revproxy-service:
+  #   image: nginx:1.17.8
+  #   container_name: revproxy-service
+  #   # networks:
+  #   #   - devnet
+  #   volumes:
+  #     - ./compose-services/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./compose-services/nginx-options:/etc/nginx/nginx-options
+  #     - ./compose-services/nginx-locations:/etc/nginx/nginx-locations
+  #
+  #     # manual (!letsencrypt)
+  #     # - ./compose-services/Secrets/TLS/service.crt:/etc/nginx/ssl/nginx.crt
+  #     # - ./compose-services/Secrets/TLS/service.key:/etc/nginx/ssl/nginx.key
+  #
+  #     # for letsencrypt
+  #     - ./compose-services/onprem/certbot/conf:/etc/letsencrypt
+  #     - ./compose-services/onprem/certbot/www:/var/www/certbot
+  #     - ./compose-services/scripts/revproxy_start.sh:/etc/nginx/run.sh
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -f http://localhost"]
+  #     interval: 60s
+  #     timeout: 5s
+  #     retries: 3
+  #   depends_on:
+  #     - indexd-service
+  #     - peregrine-service
+  #     - sheepdog-service
+  #     - fence-service
+  #     - portal-service
+  #     - pidgin-service
+  #     - voucher-service
+  #   # command: bash revproxy_start.sh
 
 
-  # for letsencrypt
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    networks:
-      - devnet
-    volumes:
-      - ./onprem/certbot/conf:/etc/letsencrypt
-      - ./onprem/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  # # for letsencrypt
+  # certbot:
+  #   image: certbot/certbot
+  #   container_name: certbot
+  #   # networks:
+  #   #   - devnet
+  #   volumes:
+  #     - ./compose-services/onprem/certbot/conf:/etc/letsencrypt
+  #     - ./compose-services/onprem/certbot/www:/var/www/certbot
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
-networks:
-  devnet:
+# networks:
+#   devnet:
 volumes:
   psqldata:
   esdata01:

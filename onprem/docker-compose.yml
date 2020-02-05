@@ -28,11 +28,11 @@ services:
     image: "onprem/s3indexer"
     container_name: s3indexer-service
     volumes:
-      - ./Secrets/s3indexer-state:/var/s3indexer/state  # store re-try info
-      - ./Secrets/fence-config.yaml:/var/s3indexer/fence-config.yaml  # pass bucket info to s3clientindexer
-      - ./Secrets/indexd_creds.json:/var/s3indexer/indexd_creds.json  # read new files from indexd db
-    networks:
-      - devnet
+      - ./compose-services/Secrets/s3indexer-state:/var/s3indexer/state  # store re-try info
+      - ./compose-services/Secrets/fence-config.yaml:/var/s3indexer/fence-config.yaml  # pass bucket info to s3clientindexer
+      - ./compose-services/Secrets/indexd_creds.json:/var/s3indexer/indexd_creds.json  # read new files from indexd db
+    # networks:
+    #   - devnet
     depends_on:
       - indexd-service
     <<: *logging  # include logging
@@ -42,34 +42,32 @@ services:
     image: "onprem/hatchery"
     container_name: hatchery-service
     volumes:
-      - ./onprem/hatchery-lite:/app
-    networks:
-      - devnet
+      - ./compose-services/onprem/hatchery-lite:/app
+    # networks:
+    #   - devnet
     # <<: *logging  # include logging
 
   # jwt simplifier /gen3-authz
   voucher-service:
     build:
-        context: onprem/voucher
+        context: compose-services/onprem/voucher
     container_name: voucher-service
-    networks:
-      - devnet
+    # networks:
+    #   - devnet
     volumes:
-      - ./onprem/voucher:/app
+      - ./compose-services/onprem/voucher:/app
       # use long form due to colon in source
       - type: bind
-        source: ./Secrets/fenceJwtKeys/2020-01-31T23:24:26Z/jwt_private_key.pem
+        source: ./compose-services/Secrets/fenceJwtKeys/2020-01-31T23:24:26Z/jwt_private_key.pem
         target: /fence/keys/jwt_private_key.pem
       - type: bind
-        source: ./Secrets/fenceJwtKeys/2020-01-31T23:24:26Z/jwt_public_key.pem
+        source: ./compose-services/Secrets/fenceJwtKeys/2020-01-31T23:24:26Z/jwt_public_key.pem
         target: /fence/keys/jwt_public_key.pem
     ports:
       - 5000:5000
     depends_on:
       - fence-service
       - arborist-service
-    networks:
-      - devnet
     # <<: *logging  # include logging
 
   # see https://itnext.io/deploy-elk-stack-in-docker-to-monitor-containers-c647d7e2bfcd
@@ -82,18 +80,18 @@ services:
     ports:
       - 12201:12201/udp
     volumes:
-      - ./Secrets/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-    networks:
-      - devnet
+      - ./compose-services/Secrets/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    # networks:
+    #   - devnet
 
 
   tmp-service:
     image: rocker/shiny
     container_name: tmp-service
     volumes:
-      - ./onprem/shiny-server/shiny-server.conf:/etc/shiny-server/shiny-server.conf
-    networks:
-      - devnet
+      - ./compose-services/onprem/shiny-server/shiny-server.conf:/etc/shiny-server/shiny-server.conf
+    # networks:
+    #   - devnet
 
 
   # ---------
