@@ -1,5 +1,5 @@
 
-all: fence/ gen3-s3indexer/ hatchery-lite/ data-portal/ tube/
+all: fence/ gen3-s3indexer/ hatchery-lite/ data-portal/ tube/ logstash/
 
 # build and tag an instance of fence
 fence/:
@@ -41,10 +41,18 @@ data-portal/:
 tube/:
 	git clone https://github.com/ohsu-comp-bio/tube.git
 	cd tube ;\
-                git checkout secure_elastic; \
-                docker build --network=host -t onprem/tube .
+	  git checkout secure_elastic; \
+	  docker build --network=host -t onprem/tube .
 
 # build and tag an instance of tube
 logstash/:
 	cd logstash;\
                 docker build --network=host -t onprem/logstash .
+
+
+gdan-tmp-webdash/:
+	git clone https://github.com/adamstruck/gdan-tmp-webdash
+	cd gdan-tmp-webdash;\
+		git checkout master; \
+		cd shiny-server; \
+		docker build --network=host -t onprem/gdan-tmp-webdash .

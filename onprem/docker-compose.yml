@@ -10,13 +10,14 @@ x-docker-data: &logging
       max-size: 10m
       max-file: "5"
 
-  # logging:
-  #   driver: gelf
-  #   options:
-  #     # Use udp://host.docker.internal:12201 when you are using Docker Desktop for Mac
-  #     # docs: https://docs.docker.com/docker-for-mac/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host
-  #     # issue: https://github.com/lvthillo/docker-elk/issues/1
-  #     gelf-address: "udp://localhost:12201"
+x-docker-data: &gelf-logging
+  logging:
+    driver: gelf
+    options:
+      # Use udp://host.docker.internal:12201 when you are using Docker Desktop for Mac
+      # docs: https://docs.docker.com/docker-for-mac/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host
+      # issue: https://github.com/lvthillo/docker-elk/issues/1
+      gelf-address: "udp://localhost:12201"
 
 
 
@@ -35,7 +36,7 @@ services:
     #   - devnet
     depends_on:
       - indexd-service
-    <<: *logging  # include logging
+    <<: *gelf-logging  # include logging
 
   # replacement for hatchery Job Dispatcher https://github.com/uc-cdis/hatchery
   hatchery-service:
@@ -58,10 +59,10 @@ services:
       - ./compose-services/onprem/voucher:/app
       # use long form due to colon in source
       - type: bind
-        source: ./compose-services/Secrets/fenceJwtKeys/2020-01-31T23:24:26Z/jwt_private_key.pem
+        source: ./compose-services/Secrets/fenceJwtKeys/2020-02-05T19:12:09Z/jwt_private_key.pem
         target: /fence/keys/jwt_private_key.pem
       - type: bind
-        source: ./compose-services/Secrets/fenceJwtKeys/2020-01-31T23:24:26Z/jwt_public_key.pem
+        source: ./compose-services/Secrets/fenceJwtKeys/2020-02-05T19:12:09Z/jwt_public_key.pem
         target: /fence/keys/jwt_public_key.pem
     ports:
       - 5000:5000
@@ -86,13 +87,19 @@ services:
 
 
   tmp-service:
-    image: rocker/shiny
+    image: onprem/gdan-tmp-webdash
     container_name: tmp-service
+    environment:
+      GRIP_HOST: grip:8201
+      GDAN_TMP_GRAPH: gdan_tmp
+    command: ["R", "-e", "shiny::runApp('/srv/shiny-server/GDAN-TMP', host = '0.0.0.0', port = 3838)"]
     volumes:
-      - ./compose-services/onprem/shiny-server/shiny-server.conf:/etc/shiny-server/shiny-server.conf
-    # networks:
-    #   - devnet
-
+      - ./compose-services/onprem/gdan-tmp-webdash/configs/shiny-server.conf:/etc/shiny-server/shiny-server.conf
+      - ./compose-services/onprem/gdan-tmp-webdash/webdash:/srv/shiny-server/GDAN-TMP:ro
+      - /mnt/data2/gdan-tmp-webdash/data:/mnt/data:ro
+    ports:
+      - 3838:3838
+    <<: *gelf-logging  # include logging
 
   # ---------
   # overrides

@@ -162,10 +162,12 @@ services:
     volumes:
       - ./compose-services/Secrets/guppy_config.json:/guppy/guppy_config.json
       - ./compose-services/scripts/guppy_start.sh:/guppy/guppy_start.sh
+    env_file:
+     - ./compose-services/Secrets/.env
     environment:
       - GUPPY_CONFIG_FILEPATH=/guppy/guppy_config.json
       - GEN3_ARBORIST_ENDPOINT=http://arborist-service
-      - GEN3_ES_ENDPOINT=http://admin:admin@esproxy-service:9200
+      # - GEN3_ES_ENDPOINT= <-- set in .env
       # getting Error: listen EACCES: permission denied 0.0.0.0:80 ?
       - GUPPY_PORT=3000
     depends_on:
@@ -206,9 +208,11 @@ services:
     build:
       context: compose-services/kibana
     container_name: kibana-service
+    env_file:
+     - ./compose-services/Secrets/.env
     environment:
       - SERVER_NAME=kibana-service
-      - ELASTICSEARCH_URL=http://admin:admin@esproxy-service:9200
+      # - ELASTICSEARCH_URL= << set in .env
       - SERVER_BASEPATH=/kibana
     volumes:
       - ./compose-services/Secrets/elasticsearch-open-distro/kibana.yml:/usr/share/kibana/config/kibana.yml
@@ -249,8 +253,8 @@ services:
       - NODE_ENV=dev
       #- MOCK_STORE=true
       - APP=gitops
-      - GDC_SUBPATH=http://revproxy-service/api/v0/submission/
-      - WORKSPACE_URL=https://bmeg-gen3.ddns.net/lw-workspace
+      - GDC_SUBPATH=https://nginx/api/v0/submission/
+      - WORKSPACE_URL=https://commons.bmeg.io/lw-workspace
       # CSP allow links to all from additional url
       # - WIKI_URL=*
     healthcheck:
@@ -282,7 +286,7 @@ services:
   #   #   - devnet
   #   environment:
   #     - DICTIONARY_URL=https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-  #     - ES_URL=http://admin:admin@esproxy-service:9200
+  #     # - ES_URL= set in .env
   #     - ES_INDEX_NAME=etl
   #     - HADOOP_URL=hdfs://spark-service:9000
   #     - HADOOP_HOST=spark-service
