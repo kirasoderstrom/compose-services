@@ -16,7 +16,7 @@ if (getenv('MEDIAWIKI_META_NAMESPACE') != '') {
 }
 
 # Short URLs
-$wgScriptPath = "/hop-wiki";
+$wgScriptPath = "/bmeg-wiki";
 $wgArticlePath = "/wiki/$1";
 $wgUsePathInfo = true;
 $wgScriptExtension = ".php";
@@ -29,7 +29,7 @@ if (getenv('MEDIAWIKI_SERVER') == '') {
 
 $wgResourceBasePath = $wgScriptPath;
 
-$wgLogo = "$wgResourceBasePath/resources/assets/healthy-oregon-for-the-web.jpg";
+$wgLogo = "$wgResourceBasePath/resources/assets/bmeg-black-logo.png";
 
 if (getenv('MEDIAWIKI_EMERGENCY_CONTACT') != '') {
     $wgEmergencyContact = getenv('MEDIAWIKI_EMERGENCY_CONTACT');
