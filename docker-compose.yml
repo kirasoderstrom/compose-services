@@ -211,51 +211,51 @@ services:
       - postgres
       - peregrine-service
       - sheepdog-service
-  jupyter-service:
-    image: "quay.io/occ_data/jupyternotebook:1.7.2"
-    #image: jupyter/minimal-notebook
-    container_name: jupyter-service
-    networks:
-      - devnet
-    volumes:
-      - ./scripts/jupyter_config.py:/home/jovyan/.jupyter/jupyter_notebook_config.py
-  tube-service:
-    # image: "quay.io/cdis/tube:master"
-    build:
-      context: onprem/tube
-    container_name: tube-service
-    command: bash -c "while true; do sleep 5; done"
-    networks:
-      - devnet
-    environment:
-      - DICTIONARY_URL=https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-      - ES_URL=http://admin:admin@esproxy-service:9200
-      - ES_INDEX_NAME=etl
-      - HADOOP_URL=hdfs://spark-service:9000
-      - HADOOP_HOST=spark-service
-    volumes:
-      - ./Secrets/etl_creds.json:/usr/share/gen3/tube/creds.json
-      - ./Secrets/etlMapping.yaml:/usr/share/gen3/tube/etlMapping.yaml
-      - ./Secrets/user.yaml:/usr/share/gen3/tube/user.yaml
-    depends_on:
-      - postgres
-      - esproxy-service
-      - spark-service
-  spark-service:
-    image: "quay.io/cdis/gen3-spark:master"
-    container_name: spark-service
-    command: bash -c "python run_config.py && hdfs namenode -format && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"
-    expose:
-      - 22
-      - 8030
-      - 8031
-      - 8032
-      - 9000
-    networks:
-      - devnet
-    environment:
-      - HADOOP_URL=hdfs://0.0.0.0:9000
-      - HADOOP_HOST=0.0.0.0
+  # jupyter-service:
+  #   image: "quay.io/occ_data/jupyternotebook:1.7.2"
+  #   #image: jupyter/minimal-notebook
+  #   container_name: jupyter-service
+  #   networks:
+  #     - devnet
+  #   volumes:
+  #     - ./scripts/jupyter_config.py:/home/jovyan/.jupyter/jupyter_notebook_config.py
+  # tube-service:
+  #   # image: "quay.io/cdis/tube:master"
+  #   build:
+  #     context: onprem/tube
+  #   container_name: tube-service
+  #   command: bash -c "while true; do sleep 5; done"
+  #   networks:
+  #     - devnet
+  #   environment:
+  #     - DICTIONARY_URL=https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+  #     - ES_URL=http://admin:admin@esproxy-service:9200
+  #     - ES_INDEX_NAME=etl
+  #     - HADOOP_URL=hdfs://spark-service:9000
+  #     - HADOOP_HOST=spark-service
+  #   volumes:
+  #     - ./Secrets/etl_creds.json:/usr/share/gen3/tube/creds.json
+  #     - ./Secrets/etlMapping.yaml:/usr/share/gen3/tube/etlMapping.yaml
+  #     - ./Secrets/user.yaml:/usr/share/gen3/tube/user.yaml
+  #   depends_on:
+  #     - postgres
+  #     - esproxy-service
+  #     - spark-service
+  # spark-service:
+  #   image: "quay.io/cdis/gen3-spark:master"
+  #   container_name: spark-service
+  #   command: bash -c "python run_config.py && hdfs namenode -format && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"
+  #   expose:
+  #     - 22
+  #     - 8030
+  #     - 8031
+  #     - 8032
+  #     - 9000
+  #   networks:
+  #     - devnet
+  #   environment:
+  #     - HADOOP_URL=hdfs://0.0.0.0:9000
+  #     - HADOOP_HOST=0.0.0.0
   kibana-service:
     build:
       context: kibana

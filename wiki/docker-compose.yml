@@ -1,0 +1,102 @@
+version: '3.4'
+
+# use yaml's 'anchor' to define logging
+# x-docker-data is an extension and when docker-compose
+# parses the YAML, it will not do anything with it
+
+x-docker-data: &logging
+  logging:
+    driver: gelf
+    options:
+      # Use udp://host.docker.internal:12201 when you are using Docker Desktop for Mac
+      # docs: https://docs.docker.com/docker-for-mac/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host
+      # issue: https://github.com/lvthillo/docker-elk/issues/1
+      gelf-address: "udp://localhost:12201"
+
+services:
+
+  wiki-service:
+    build:
+      context: wiki/mediawiki
+      args:
+        - MEDIAWIKI_INSTALL_PATH=/var/www/mediawiki/bmeg-wiki
+    container_name: wiki-service
+    # ports:
+    #   - "8080:8080"
+    environment:
+      # - MEDIAWIKI_SERVER=https://gen3.compbio.ohsu.edu
+      # - MEDIAWIKI_SITENAME=BMEGWiki
+      # - MEDIAWIKI_LANGUAGE_CODE=en
+      # - MEDIAWIKI_DB_TYPE=sqlite
+      # - MEDIAWIKI_DB_NAME=wikidb
+      # - MEDIAWIKI_ENABLE_UPLOADS=1
+      # - MEDIAWIKI_EXTENSION_VISUAL_EDITOR_ENABLED=0
+      # - MEDIAWIKI_DEFAULT_SKIN=vector
+      # - MEDIAWIKI_DEBUG=1
+      # - MEDIAWIKI_DB_PATH=/data
+      # - MEDIAWIKI_SECRET_KEY=9c80b11a89407828e6c766c2b6a2c6f4d396dfcab08cdccf70374dbf0b772dd0
+      MEDIAWIKI_SERVER: https://gen3.compbio.ohsu.edu
+      MEDIAWIKI_SITENAME: BMEGWiki
+      MEDIAWIKI_LANGUAGE_CODE: en
+      MEDIAWIKI_SECRET_KEY: ${SECRET_KEY}
+      #MEDIAWIKI_META_NAMESPACE: MyNamespace
+      MEDIAWIKI_DB_TYPE: mysql
+      MEDIAWIKI_DB_HOST: mysql-service
+      MEDIAWIKI_DB_PORT: 3306
+      MEDIAWIKI_DB_NAME: wikidb
+      MEDIAWIKI_DB_USER: wikiuser
+      MEDIAWIKI_DB_PREFIX: mywiki_
+      MEDIAWIKI_DB_TABLE_OPTIONS: ENGINE=InnoDB, DEFAULT CHARSET=binary
+      MEDIAWIKI_DB_PASSWORD: ${DB_PASSWORD}
+      MEDIAWIKI_ENABLE_UPLOADS: 1
+      MEDIAWIKI_MAX_UPLOAD_SIZE: 10M
+      MEDIAWIKI_DEFAULT_SKIN: vector
+      MEDIAWIKI_SMTP: 0
+      # MEDIAWIKI_SMTP_SSL_VERIFY_PEER: 0
+      # MEDIAWIKI_SMTP_HOST: ${SMTP_HOST}
+      # MEDIAWIKI_SMTP_IDHOST: ${SMTP_IDHOST}
+      # MEDIAWIKI_SMTP_PORT: 587
+      # MEDIAWIKI_SMTP_AUTH: 1
+      # MEDIAWIKI_SMTP_USERNAME: ${SMTP_USERNAME}
+      # MEDIAWIKI_SMTP_PASSWORD: ${SMTP_PASSWORD}
+      # MEDIAWIKI_EMERGENCY_CONTACT: ${EMERGENCY_CONTACT}
+      # MEDIAWIKI_PASSWORD_SENDER: ${PASSWORD_SENDER}
+      MEDIAWIKI_EXTENSION_VISUAL_EDITOR_ENABLED: 0
+      MEDIAWIKI_EXTENSION_USER_MERGE_ENABLED: 1
+      MEDIAWIKI_FILE_EXTENSIONS: png,gif,jpg,jpeg,webp,pdf
+      MEDIAWIKI_DEBUG: 1
+      PHPFPM_WORKERS_START: 1
+      PHPFPM_WORKERS_MIN: 1
+      PHPFPM_WORKERS_MAX: 20
+      PARSOID_WORKERS: 1
+    volumes:
+      - ./wiki/images:/images
+      - ./wiki/data:/data
+      - ./wiki/resources/assets/bmeg-black-logo.png:/var/www/mediawiki/bmeg-wiki/resources/assets/bmeg-black-logo.png
+      - ./wiki/LocalSettings.php:/var/www/mediawiki/bmeg-wiki/LocalSettings.php:ro
+      - ./wiki/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./wiki/extensions/Auth_remoteuser:/var/www/mediawiki/bmeg-wiki/extensions/Auth_remoteuser:ro
+      # - ./wiki/log:/var/log/mediawiki  # for debug log
+      # - ./wiki/fastcgi_params:/etc/nginx/fastcgi_params:ro
+    networks:
+      - devnet
+    depends_on:
+      - mysql-service
+
+  mysql-service:
+    image: mysql:5.7
+    container_name: mysql-service
+    environment:
+      MYSQL_DATABASE: wikidb
+      MYSQL_USER: wikiuser
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    # ports:
+    # - 127.0.0.1:3306:3306
+    volumes:
+      - mediawiki_mysql:/var/lib/mysql
+    networks:
+      - devnet
+
+volumes:
+  mediawiki_mysql:

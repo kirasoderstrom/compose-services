@@ -247,8 +247,7 @@ require 'ExtraLocalSettings.php';
 
 # proxy auth
 wfLoadExtension( 'Auth_remoteuser' );
-// If account creation by anonymous users is forbidden, then allow
-// it to be created automatically (by the extension).
+// Only login users automatically if known to the wiki already.
 $wgGroupPermissions['*']['createaccount'] = false;
 $wgGroupPermissions['*']['autocreateaccount'] = true;
 
@@ -261,3 +260,6 @@ $wgEditPageFrameOptions=false;
 
 // to assign user to admin groups
 // php createAndPromote.php --bureaucrat --sysop --interface-admin    --force TitleCaseUserNameHere
+
+enableSemantics( 'gen3.compbio.ohsu.edu' );
+require_once "$IP/extensions/SemanticMediaWikiGraph/SemanticMediaWikiGraph.php";
