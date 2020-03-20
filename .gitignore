@@ -10,3 +10,4 @@ Secrets/
 *.pytest_cache
 *.cache
 *pyc
+wiki
