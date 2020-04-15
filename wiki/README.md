@@ -21,6 +21,7 @@ export SECRET_KEY=XXX
 # after startup, intialize the DB
 grep -q "^ *- ./wiki/LocalSettings.php" wiki/docker-compose.yml && echo 'WARNING: edit docker-compose'
 grep -q "# - ./wiki/LocalSettings.php" wiki/docker-compose.yml && \
+  dc stop wiki-service && \
   dc exec  mysql-service mysql -u wikiuser --password=$DB_PASSWORD -e "drop database wikidb;" && \
   unset SECRET_KEY && \
   rs wiki && \
@@ -65,6 +66,7 @@ dc exec wiki-service php maintenance/pageExists.php Property:GID | grep exists  
 
 # download wiki extract from BMEG
 # TODO - replace with dvc instructions
+sudo rm wiki/data/*.gz
 scp -i ~/.ssh/id_rsa.pem ubuntu@10.96.11.98:/mnt/bmeg-etl/outputs/wiki/*.gz wiki/data/
 
 # remove old xml files
@@ -83,10 +85,12 @@ python3 wiki/data/import_pages.py  --input wiki/data/Compound.wiki.json.gz --out
 IMPORT_JOB_WORKERS=25
 
 # import all, we sort randomly so we don't have to wait to browse files at the end
-dc exec -T -d  wiki-service sh -c "ls -1p /data/imports/*.xml | sort -R | parallel -j $IMPORT_JOB_WORKERS php maintenance/importDump.php   --memory-limit max"  
+dc exec -T -d  wiki-service sh -c "ls -1p /data/imports/C*.xml | sort -R | parallel -j $IMPORT_JOB_WORKERS php maintenance/importDump.php   --memory-limit max"  
+
+
 
 # monitor progress ,  see CPU% of wiki and mysql
-# Note: takes ~ 1 Hour
+# Note: takes > 1 Hour
 docker stats
 
 

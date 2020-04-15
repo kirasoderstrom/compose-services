@@ -1,6 +1,8 @@
 #!/bin/bash
 # Script to create and re-create es indices and setup guppy
 
+echo $ELASTICSEARCH_URL
+
 sleep 2
 docker exec esproxy-service curl -X DELETE $ELASTICSEARCH_URL/etl_0 --insecure
 sleep 2

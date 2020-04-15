@@ -27,7 +27,7 @@ services:
       - devnet
     depends_on:
       - indexd-service
-    <<: *logging  # include logging
+    # <<: *logging  # include logging
 
   # replacement for hatchery Job Dispatcher https://github.com/uc-cdis/hatchery
   hatchery-service:
@@ -77,12 +77,23 @@ services:
 
 
   tmp-service:
-    image: rocker/shiny
-    container_name: tmp-service
-    volumes:
-      - ./onprem/shiny-server/shiny-server.conf:/etc/shiny-server/shiny-server.conf
-    networks:
-      - devnet
+      image: onprem/gdan-tmp-webdash
+      container_name: tmp-service
+      # deploy:
+      #   resources:
+      #     limits:
+      #       cpus: '4'
+      #       memory: '10G'
+      command: ["R", "-e", "shiny::runApp('/srv/shiny-server/GDAN-TMP', host = '0.0.0.0', port = 3838)"]
+      volumes:
+        - ./onprem/gdan-tmp-webdash/configs/shiny-server.conf:/etc/shiny-server/shiny-server.conf
+        - ./onprem/gdan-tmp-webdash/webdash:/srv/shiny-server/GDAN-TMP:ro
+        - /mnt/data2/gdan-tmp-webdash-jordan/data:/mnt/data:ro
+      ports:
+        - 3838:3838
+      networks:
+        - devnet
+
 
 
   # ---------
@@ -92,6 +103,14 @@ services:
   fence-service:
     image: "onprem/fence"
     # <<: *logging  # include logging
+
+  # over ride schema location 
+  peregrine-service:
+    volumes:
+    - ./onprem/covid19_datadictionary/gdcdictionary/schemas:/schemas_dir
+  sheepdog-service:
+    volumes:
+    - ./onprem/covid19_datadictionary/gdcdictionary/schemas:/schemas_dir
 
   # # include logging
   # arborist-service:
