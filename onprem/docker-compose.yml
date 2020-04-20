@@ -90,16 +90,25 @@ services:
     image: onprem/gdan-tmp-webdash
     container_name: tmp-service
     environment:
+      LOAD_THREADS: 12
       GRIP_HOST: grip:8201
       GDAN_TMP_GRAPH: gdan_tmp
     command: ["R", "-e", "shiny::runApp('/srv/shiny-server/GDAN-TMP', host = '0.0.0.0', port = 3838)"]
     volumes:
       - ./compose-services/onprem/gdan-tmp-webdash/configs/shiny-server.conf:/etc/shiny-server/shiny-server.conf
       - ./compose-services/onprem/gdan-tmp-webdash/webdash:/srv/shiny-server/GDAN-TMP:ro
-      - /mnt/data2/gdan-tmp-webdash/data:/mnt/data:ro
+      - /mnt/data2/gdan-tmp-webdash-jordan/data:/mnt/data:ro
     ports:
       - 3838:3838
     <<: *gelf-logging  # include logging
+
+  # tmp-service:
+  #   image: rocker/shiny
+  #   container_name: tmp-service
+  #   volumes:
+  #     - ./compose-services/onprem/shiny-server/shiny-server.conf:/etc/shiny-server/shiny-server.conf
+
+
 
   # ---------
   # overrides

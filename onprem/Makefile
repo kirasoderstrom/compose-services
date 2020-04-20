@@ -51,7 +51,7 @@ logstash/:
 
 
 gdan-tmp-webdash/:
-	git clone https://github.com/adamstruck/gdan-tmp-webdash
+	git clone https://github.com/jordan2lee/gdan-tmp-webdash
 	cd gdan-tmp-webdash;\
 		git checkout master; \
 		cd shiny-server; \
