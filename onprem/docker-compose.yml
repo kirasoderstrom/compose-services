@@ -47,8 +47,8 @@ services:
     networks:
       - devnet
     environment:
-      - JWT_PRIVATE_KEY_PATH=/fence/keys/2019-09-18T19:08:35Z/jwt_private_key.pem
-      - JWT_PUBLIC_KEY_PATH=/fence/keys/2019-09-18T19:08:35Z/jwt_public_key.pem
+      - JWT_PRIVATE_KEY_PATH=/fence/keys/2020-04-28T20:02:01Z/jwt_private_key.pem
+      - JWT_PUBLIC_KEY_PATH=/fence/keys/2020-04-28T20:02:01Z/jwt_public_key.pem      
     volumes:
       - ./onprem/voucher:/app
       - ./Secrets/fenceJwtKeys:/fence/keys
@@ -76,39 +76,29 @@ services:
       - devnet
 
 
-  tmp-service:
-      image: onprem/gdan-tmp-webdash
-      container_name: tmp-service
-      # deploy:
-      #   resources:
-      #     limits:
-      #       cpus: '4'
-      #       memory: '10G'
-      command: ["R", "-e", "shiny::runApp('/srv/shiny-server/GDAN-TMP', host = '0.0.0.0', port = 3838)"]
-      volumes:
-        - ./onprem/gdan-tmp-webdash/configs/shiny-server.conf:/etc/shiny-server/shiny-server.conf
-        - ./onprem/gdan-tmp-webdash/webdash:/srv/shiny-server/GDAN-TMP:ro
-        - /mnt/data2/gdan-tmp-webdash-jordan/data:/mnt/data:ro
-      ports:
-        - 3838:3838
-      networks:
-        - devnet
-
-
-
   # ---------
   # overrides
   # ---------
   # over ride fence to use our fork which supports non aws url signing
   fence-service:
     image: "onprem/fence"
-    # <<: *logging  # include logging
+    
+  revproxy-service:
+    depends_on:
+      - hatchery-service
+      - voucher-service
+      - esproxy-service
+      - kibana-service
+
 
   # over ride schema location 
   peregrine-service:
     volumes:
     - ./onprem/covid19_datadictionary/gdcdictionary/schemas:/schemas_dir
   sheepdog-service:
+    volumes:
+    - ./onprem/covid19_datadictionary/gdcdictionary/schemas:/schemas_dir
+  tube-service:
     volumes:
     - ./onprem/covid19_datadictionary/gdcdictionary/schemas:/schemas_dir
 

@@ -1,5 +1,5 @@
 
-all: fence/ gen3-s3indexer/ hatchery/ portal/ tube/
+all: fence/ gen3-s3indexer/ hatchery/ portal/ tube/ covid19_datadictionary/
 
 # build and tag an instance of fence
 fence/: 
@@ -42,22 +42,9 @@ tube/:
 	git clone https://github.com/ohsu-comp-bio/tube.git
 	cd data-portal ;\
                 git checkout secure-elastic; \
-                docker build --network=host -t onprem/data-portal .
-
-gdan-tmp-webdash-v0/:
-	git clone https://github.com/bmeg/gdan-tmp-webdash
-	cd gdan-tmp-webdash;\
-		git checkout master; \
-		cd shiny-server; \
-		docker build --network=host -t onprem/gdan-tmp-webdash .
-
-gdan-tmp-webdash/:
-	git clone https://github.com/jordan2lee/gdan-tmp-webdash
-	cd gdan-tmp-webdash;\
-		git checkout master; \
-		cd shiny-server; \
-		docker build --network=host -t onprem/gdan-tmp-webdash .
-
+                docker build --network=host -t onprem/tube .
 
 covid19_datadictionary/:
-	git clone https://github.com/ohsu-comp-bio/covid19_datadictionary.git
+	git clone git@github.com:uc-cdis/covid19_datadictionary.git
+	# git clone https://github.com/ohsu-comp-bio/covid19_datadictionary.git
+	
