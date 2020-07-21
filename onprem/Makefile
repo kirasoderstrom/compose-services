@@ -1,5 +1,5 @@
 
-all: fence/ gen3-s3indexer/ hatchery/ portal/ tube/ covid19_datadictionary/
+all: fence/ gen3-s3indexer/ hatchery-lite/ data-portal/ tube/ covid19_datadictionary/
 
 # build and tag an instance of fence
 fence/: 
@@ -23,7 +23,7 @@ gen3-s3indexer/: indexs3client/
 		docker build --network=host -t onprem/s3indexer .
 
 # build and tag an instance of hatchery-local
-hatchery/:
+hatchery-lite/:
 	git clone https://github.com/ohsu-comp-bio/hatchery-lite.git
 	cd hatchery-lite;\
 		git checkout master ; \
@@ -31,7 +31,7 @@ hatchery/:
 
 
 # build and tag an instance of data-portal
-portal/:
+data-portal/:
 	git clone https://github.com/ohsu-comp-bio/data-portal.git
 	cd data-portal ;\
 		git checkout workspace-default-notebook ; \
@@ -45,6 +45,11 @@ tube/:
                 docker build --network=host -t onprem/tube .
 
 covid19_datadictionary/:
-	git clone git@github.com:uc-cdis/covid19_datadictionary.git
-	# git clone https://github.com/ohsu-comp-bio/covid19_datadictionary.git
+	# git clone git@github.com:uc-cdis/covid19_datadictionary.git
+	git clone https://github.com/ohsu-comp-bio/covid19_datadictionary.git
 	
+analysis-etl/:
+	# you will need to setup .netrc to hold userid/password
+	git clone https://itgcode.ohsu.edu/scm/key/analysis-etl.git
+	cd analysis-etl ;\
+		docker build --network=host -t onprem/analysis-etl .

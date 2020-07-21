@@ -75,6 +75,20 @@ services:
     networks:
       - devnet
 
+  analysis-etl-service:
+    image: onprem/analysis-etl
+    container_name: analysis-etl-service
+    volumes:
+      - ./onprem/covid19_datadictionary:/root/covid19_datadictionary
+      - /mnt/data/data:/root/data
+      - /mnt/data/out:/root/out
+      - /mnt/data/out-graph:/root/out-graph
+      - /mnt/data/TEMP-inputdata/:/root/TEMP-inputdata
+    # To keep a container running   
+    command: tail -F anything      
+    networks:
+      - devnet
+
 
   # ---------
   # overrides
