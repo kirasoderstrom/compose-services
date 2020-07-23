@@ -75,6 +75,30 @@ services:
     networks:
       - devnet
 
+
+
+  mongo:
+    image: mongo:3.6
+    container_name: mongo
+    volumes:
+       - /mnt/data/mongo-data:/data/db
+    networks:
+      - devnet
+
+  grip:
+    image: bmeg/grip
+    container_name: grip
+    volumes:
+      - ./Secrets/grip_config.yaml:/config/grip_config.yml
+    entrypoint: ["grip", "server", "--config", "/config/grip_config.yml"]
+    ports:
+      - 8201:8201
+      - 8202:8202
+    depends_on:
+      - mongo
+    networks:
+      - devnet
+
   analysis-etl-service:
     image: onprem/analysis-etl
     container_name: analysis-etl-service
@@ -84,11 +108,33 @@ services:
       - /mnt/data/out:/root/out
       - /mnt/data/out-graph:/root/out-graph
       - /mnt/data/TEMP-inputdata/:/root/TEMP-inputdata
-    # To keep a container running   
+    environment:
+      - GRIP_CLI_HOST=grip:8202
+    # Null command, just keeps container running   
     command: tail -F anything      
     networks:
       - devnet
+    depends_on:
+      - grip
 
+  dashboard-multi-service:
+    image: onprem/dashboard-multi
+    container_name: dashboard-multi-service
+    volumes:
+      - ./onprem/dashboard-multi:/tmp
+      - ./onprem/dashboard-multi/k2o_dash/:/k2o_dash/
+      - /mnt/data/data/:/k2o_dash/data/
+    command: python -m k2o_dash
+    # command: tail -F anything      
+    ports:
+      # HOST:CONTAINER
+      - 8080:80
+    networks:
+      - devnet
+    environment:
+      - GRIP_URL=http://grip:8201
+    depends_on:
+      - grip
 
   # ---------
   # overrides
@@ -103,6 +149,7 @@ services:
       - voucher-service
       - esproxy-service
       - kibana-service
+      - dashboard-multi-service
 
 
   # over ride schema location 

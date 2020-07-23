@@ -1,5 +1,5 @@
 
-all: fence/ gen3-s3indexer/ hatchery-lite/ data-portal/ tube/ covid19_datadictionary/
+all: fence/ gen3-s3indexer/ hatchery-lite/ data-portal/ tube/ covid19_datadictionary/ analysis-etl/ dashboard-multi/
 
 # build and tag an instance of fence
 fence/: 
@@ -53,3 +53,10 @@ analysis-etl/:
 	git clone https://itgcode.ohsu.edu/scm/key/analysis-etl.git
 	cd analysis-etl ;\
 		docker build --network=host -t onprem/analysis-etl .
+
+dashboard-multi/:
+	# you will need to setup .netrc to hold userid/password
+	git clone https://itgcode.ohsu.edu/scm/key/dashboard-multi.git
+	cd dashboard-multi/ ;\
+		git checkout no_sqldb_deps; \
+		docker build --network=host -t onprem/dashboard-multi .
