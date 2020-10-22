@@ -98,8 +98,9 @@ services:
       - "8050"
     env_file:
      - ./compose-services/Secrets/.env      
-    # environment:
+    environment:
       # - ELASTICSEARCH_URL= << set in .env
+      - BMEG_STAGE=PROD
     command: ["./bin/wait-for-it.sh", "esproxy-service:9200", "--", "./bin/setup-and-launch.sh"]
     depends_on:
       - esproxy-service    
