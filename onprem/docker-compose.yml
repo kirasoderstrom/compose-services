@@ -86,28 +86,23 @@ services:
     #   - devnet
 
 
-  tmp-service:
-    image: onprem/gdan-tmp-webdash
-    container_name: tmp-service
-    environment:
-      LOAD_THREADS: 12
-      GRIP_HOST: grip:8201
-      GDAN_TMP_GRAPH: gdan_tmp
-    command: ["R", "-e", "shiny::runApp('/srv/shiny-server/GDAN-TMP', host = '0.0.0.0', port = 3838)"]
+  bmeg-dash:
+    image: onprem/bmeg-dash
+    container_name: bmeg-dash
     volumes:
-      - ./compose-services/onprem/gdan-tmp-webdash/configs/shiny-server.conf:/etc/shiny-server/shiny-server.conf
-      - ./compose-services/onprem/gdan-tmp-webdash/webdash:/srv/shiny-server/GDAN-TMP:ro
-      - /mnt/data2/gdan-tmp-webdash-jordan/data:/mnt/data:ro
+      - ./compose-services/Secrets/bmeg_credentials.json:/app/bmeg_app/secrets/bmeg_credentials.json
+      - /mnt/data2/bmeg_app/data:/app/bmeg_app/data
     ports:
-      - 3838:3838
-    <<: *gelf-logging  # include logging
-
-  # tmp-service:
-  #   image: rocker/shiny
-  #   container_name: tmp-service
-  #   volumes:
-  #     - ./compose-services/onprem/shiny-server/shiny-server.conf:/etc/shiny-server/shiny-server.conf
-
+      - 8050:8050
+    expose:
+      - "8050"
+    env_file:
+     - ./compose-services/Secrets/.env      
+    # environment:
+      # - ELASTICSEARCH_URL= << set in .env
+    command: ["./bin/wait-for-it.sh", "esproxy-service:9200", "--", "./bin/setup-and-launch.sh"]
+    depends_on:
+      - esproxy-service    
 
 
   # ---------

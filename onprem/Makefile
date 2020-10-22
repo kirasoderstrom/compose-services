@@ -1,5 +1,5 @@
 
-all: fence/ gen3-s3indexer/ hatchery-lite/ data-portal/ tube/ logstash/
+all: fence/ gen3-s3indexer/ hatchery-lite/ data-portal/ tube/ logstash/ bmeg-dash/
 
 # build and tag an instance of fence
 fence/:
@@ -49,10 +49,9 @@ logstash/:
 	cd logstash;\
                 docker build --network=host -t onprem/logstash .
 
-
-gdan-tmp-webdash/:
-	git clone https://github.com/jordan2lee/gdan-tmp-webdash
-	cd gdan-tmp-webdash;\
-		git checkout master; \
-		cd shiny-server; \
-		docker build --network=host -t onprem/gdan-tmp-webdash .
+# dash app
+bmeg-dash/:
+	git clone https://github.com/bmeg/bmeg-dash
+	cd bmeg-dash;\
+		git checkout url; \
+		docker build --network=host -t onprem/bmeg-dash .

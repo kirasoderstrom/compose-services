@@ -179,7 +179,7 @@ services:
 # dc exec esproxy-service plugins/opendistro_security/tools/securityadmin.sh -f plugins/opendistro_security/securityconfig/config.yml -icl -nhnv -cert config/kirk.pem -cacert config/root-ca.pem -key config/kirk-key.pem -t config
 # curl -XGET -k https://localhost:9200/_opendistro/_security/authinfo\?pretty -H "Authorization: Bearer XXXX"
   esproxy-service:
-    image: amazon/opendistro-for-elasticsearch:0.10.0 # 1.3.0
+    image: amazon/opendistro-for-elasticsearch:1.10.1 # 0.10.0 # 1.3.0
     container_name: esproxy-service
     volumes:
       - esdata01:/usr/share/elasticsearch/data
@@ -189,10 +189,10 @@ services:
       - cluster.name=elasticsearch-cluster
       - bootstrap.memory_lock=false
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      # 1.3.0
-      # - cluster.initial_master_nodes=node-1
-      # - discovery.seed_hosts=node-1
-      # - node.name=node-1
+      # 1.10.0
+      - cluster.initial_master_nodes=node-1
+      - discovery.seed_hosts=node-1
+      - node.name=node-1
       - opendistro_security.ssl.http.enabled=false
     ulimits:
       memlock:
@@ -201,6 +201,7 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+
     # networks:
     #   - devnet
 
